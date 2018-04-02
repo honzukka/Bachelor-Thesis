@@ -51,49 +51,52 @@
 \usepackage{paralist}       % improved enumerate and itemize
 \usepackage[usenames]{xcolor}  % typesetting in color
 
+%% My packages
+\usepackage{verbatim}		% multi-line comments
+
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{Thesis title}
+\def\ThesisTitle{Visualization of the difference between two triangle meshes}
 
 % Author of the thesis
-\def\ThesisAuthor{Name Surname}
+\def\ThesisAuthor{Jan Horešovský}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{YEAR}
+\def\YearSubmitted{2018}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
 % or a full name of a department outside MFF)
-\def\Department{Name of the department}
+\def\Department{Department of Software and Computer Science Education}
 
 % Is it a department (katedra), or an institute (ústav)?
 \def\DeptType{Department}
 
 % Thesis supervisor: name, surname and titles
-\def\Supervisor{Supervisor's Name}
+\def\Supervisor{RNDr. Josef Pelikán}
 
 % Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{department}
+\def\SupervisorsDepartment{Department of Software and Computer Science Education}
 
 % Study programme and specialization
-\def\StudyProgramme{study programme}
-\def\StudyBranch{study branch}
+\def\StudyProgramme{Computer Science}
+\def\StudyBranch{Programming and Software Systems}
 
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, a person who lent the software, etc.)
 \def\Dedication{%
-Dedication.
+I would like to thank Ida for being around, Lenka and Petr for being a great support and my supervisor RNDr. Josef Pelikán and my consultant Mgr. Ján Dupej for their feedback and ideas. A special thanks belongs to all volunteers who have participated in the user study.
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Abstract.
+Morphome3cs, a program created by researchers at Charles University, allows users to process and analyze 3D data, mostly of anthropological and archaeological origin. Morphome3cs is also able to visualize the difference between two triangle meshes by encoding various metrics into vertex color. However, this one-dimensional information is not enough to display multiple metrics at the same time. To overcome this limitation, we implemented an algorithm which uses clustered 3D arrows for visualization and, focusing on the visual appearance, we applied it in several types of visualizations in an experimental application. In order to find out if these new approaches should be incorporated into Morphome3cs, we also perfomed a user study which evaluates the performance of the new visualizations in various use cases.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces
 \def\Keywords{%
-{key} {words}
+{visualization} {triangle mesh} {difference} {clustering} {morphometrics}
 }
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -117,8 +120,12 @@ Abstract.
 \include{preface}
 \include{chap01}
 \include{chap02}
+\include{chap03}
+\include{chap04}
 
 \include{epilog}
+
+\begin{comment}
 
 %%% Bibliography
 \include{bibliography}
@@ -149,6 +156,8 @@ Abstract.
 \chapter{Attachments}
 
 \section{First Attachment}
+
+\end{comment}
 
 \openright
 \end{document}
