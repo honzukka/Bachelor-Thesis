@@ -1,3 +1,7 @@
 # TeX compilation files
 *.pdf
 *.gz
+
+# JabRef temp files
+*.bak
+*.sav
