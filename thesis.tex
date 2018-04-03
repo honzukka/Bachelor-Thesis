@@ -52,7 +52,8 @@
 \usepackage[usenames]{xcolor}  % typesetting in color
 
 %% My packages
-\usepackage{verbatim}		% multi-line comments
+\usepackage{verbatim}					% multi-line comments
+\usepackage[list=true]{subcaption}		% subfigures
 
 %%% Basic information on the thesis
 
@@ -118,12 +119,16 @@ Morphome3cs, a program created by researchers at Charles University, allows user
 
 %%% Each chapter is kept in a separate file
 \include{preface}
+
 \include{chap01}
 \include{chap02}
 \include{chap03}
 \include{chap04}
 
 \include{epilog}
+
+%%% Figures used in the thesis (consider if this is needed)
+\listoffigures
 
 \begin{comment}
 
