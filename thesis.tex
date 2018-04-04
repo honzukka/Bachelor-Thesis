@@ -25,6 +25,10 @@
 % \setlength\headheight{0mm}
 % \let\openright=\cleardoublepage
 
+%% Fix strange behavior of \textsubscript in fancyvrb mode
+\let\tmpa\textsubscript
+\DeclareTextCommandDefault{\textsubscript}{\tmpa}
+
 %% Generate PDF/A-2u
 \usepackage[a-2u]{pdfx}
 

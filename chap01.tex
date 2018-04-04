@@ -2,20 +2,6 @@
 
 Present the solution.
 
-\begin{itemize}
-\item Mention related works
-\item Describe the main idea behind the clustering techniques used
-\item Describe the main idea behind the various visualizations
-\end{itemize}
-
-More in detail:
-
-\begin{itemize}
-\item The main trick is to convert a mesh difference visualization problem to a vector field visualization problem. The methods developed there are very good and can be applied in our case. Talk about the research done for clustering.
-\item Used methods were chosen because of their simplicity. In case they had proven insufficient, it would have been possible to replace them easily by a more sophisticated version as clustering only constitutes one part of the visualization process.
-\item Now describe the solution.
-\end{itemize}
-
 %%-----------------------------------------------------------------------------------------
 %%-----------------------------------------------------------------------------------------
 \section{Seeing Mesh Difference as a Vector Field}
@@ -31,10 +17,81 @@ When visualizing a vector field, it is necessary to use clustering on the vector
 \label{fig:meshdiff_unclustered}
 \end{figure}
 %%-----------------------------------------------------------------------------------------
+%% SECTION
 %%-----------------------------------------------------------------------------------------
-\section{Arrow Clustering}
+\section{Vector Field Clustering}
 
+As clustering is a very subjective task (see fig. \ref{fig:clustering_subjectivity}), each of the above mentioned papers has their own way of dealing with it.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{./img/clustering_subjectivity.png}
+\caption{The subjectivity of clustering - are there two or four clusters in the image?}
+\label{fig:clustering_subjectivity}
+\end{figure}
 
 %%-----------------------------------------------------------------------------------------
+\subsection{Overview of Vector Field Clustering Methods}
+
+\citet{Telea99} use hierarchical (bottom-up) clustering where neighboring clusters with the smallest clustering error are merged. Each cluster has a representative vector and when merging, a weighted average of the two vectors is computed and assigned to the newly formed cluster. The paper introduced elliptic iso-error contours to compute the clustering error. The method is primarily aimed at 2D rectilinear vector fields but can be also used in 3D.
+
+\citet{Garcke00} use a continuous clustering method based on the physical model of \citet{CahnHilliard58} which is used to describe phase separation and coarsening in binary alloys. This model is applied to vector field data which results in a diffusion problem rather than a splitting and merging problem. Such an algorithm also presumes an either 2D or 3D rectilinear grid.
+
+\citet{Du04} use iterative (top-down) clustering where Voronoi regions are created around the initial cluster centers and a distance function is applied to each of them. The set of cluster centers which has the lowest value of the distance function is selected as the final cluster centers set. This method works with 2D and 3D rectilinear vector fields.
+
+\citet{Peng12} use hierarchical clustering similar to \citet{Telea99}, only they use the GPU to compute the clustering by encoding a certain static view of a mesh into a rasterized image. The computation is then done for this specific image. To obtain the clustering error, a very simple formula is employed:
+
+\begin{equation} \label{eq:clustering_error}
+\bm{e}(C_1,C_2) = k_d \cdot \frac{d_{C_1C_2}}{d_{max}} + k_v \cdot \frac{v_{C_1C_2}}{v_{max}} + k_\alpha \cdot \frac{\alpha_{C_1C_2}}{\alpha_{max}} + k_m \cdot \frac{m_{C_1C_2}}{m_{max}}
+\end{equation}
+
+where \(k_d + k_v + k_\alpha + k_m = 1\). The other components are the following:
+
+\begin{itemize}
+\item \(d_{C_1C_2}\) is the Euclidean distance between the positions of the representative vectors of the clusters. The maximum distance \(d_{max}\) is the length of a diagonal of the geometry's bounding box
+\item \(v_{C_1C_2}\) is the difference between the lengths of the representative vectors. The maximum velocity \(v_{max}\) is the largest length in the whole data set.
+\item \(\alpha_{C_1C_2}\) is angle between the representative vectors. The maximum angle \(\alpha_{max} = 180^\circ\)
+\item \(m_{C_1C_2}\) is the sum of the mesh resolutions of the two clusters. \(m_{max}\) is the largest value of \(m\) in the whole data set.
+\end{itemize}
+
+The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D meshes.
+%%-----------------------------------------------------------------------------------------
+\subsection{Our Clustering Method}
+
+For our clustering purposes, it is convenient to choose one of the presented methods and modify it if necessary. This approach saves time and gives us a baseline which we can improve upon. When selecting a clustering method, it is necessary to find a balance between simplicity and the ease of use (parameter tuning). We will lean towards simplicity in order to quickly obtain our baseline and only later look for improvements once we have a better idea of the actual performance of the selected method in our conditions.
+
+While the hierarchical clustering of \citet{Telea99} is very simple and seems like a good candidate, its error function does not take into account the varying density of our triangle meshes and is also more demanding to use in 3D. In order to calculate the error function, one needs to find the elliptic iso-error contour of a given vector. This leads to cube-root equations which would have to be computed for every pair of clustering candidates. The error function of \citet{Peng12} (see eq. \ref{eq:clustering_error}), on the other hand, is both sensitive to non-uniform meshes and computationally simpler and more scalable into higher dimensions.
+
+Lastly, we will not use the GPU-based clustering computation from \citet{Peng12} because we need to be able to view the resulting visualizations easily from various angles in real time. The basic approach in \citet{Telea99} computes the clustering once for the whole vector field.
+
+Our clustering method will use the hierarchical algorithm from \citet{Telea99} and the error function \ref{eq:clustering_error} from \citet{Peng12}. Merging of two clusters will be done by computing a weighted average of their representative vectors.
+%%-----------------------------------------------------------------------------------------
+\subsection{Algorithm}
+
+Here is the pseudocode of the hierarchical clustering algorithm as presented in \citet{Telea99}:
+
+\begin{code}[commandchars=\\\{\}]
+ClusterSet s;
+\textbf{for} (all cells cell\textsubscript{i} \textbf{in} dataset)
+\{
+	c = makeCluster(cell\textsubscript{i});
+    set level of c to 0;
+    add c to s;
+\}
+
+\textbf{for} (all clusters c\textsubscript{i} in s):
+	\textbf{for} (all clusters c\textsubscript{j} neighbours of c\textsubscript{i})
+	\{
+		e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
+        insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
+        mark c\textsubscript{i} and c\textsubscript{j} as NOT_CLUSTERED;
+	\}
+    
+int i = 0;
+...
+
+\end{code}
+%%-----------------------------------------------------------------------------------------
+%% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Proposed Visualizations}
