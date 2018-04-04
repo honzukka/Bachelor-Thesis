@@ -121,17 +121,34 @@ The result of such a clustering is then a forest instead of a tree. This may res
 %%-----------------------------------------------------------------------------------------
 \section{Proposed Visualizations}
 
-(focus on the visual appearance)
+Since our new visualizations are mostly arrow-based, we have chosen to visualize the following distance metrics:
 
 \begin{itemize}
-\item what kind of metrics are used
-\item how is the clustering connected to this
-\item what does it look like and how can the user set it
-\item what is it assumed to be good for 
+\item Vertex distance
+\item Vertex distance projected into surface normal
 \end{itemize}
 
-\subsection{Cluster Color}
+Following are the descriptions of the new visualizations.
 
+%%-----------------------------------------------------------------------------------------
 \subsection{Arrows}
 
+Once a clustering of the mesh difference vector field is obtained, representative vectors of all clusters are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow which is copied to the scene at a specific position and a specific scale given by the representative vector and the cluster it belongs to.
+
+The length of the representative vector encodes the difference metric now averaged across the whole cluster. This length also influences the scale of the 3D arrow. Because the values of the metric can be very close to zero and because their value range is not generally very large, we have decided set a certain minimum scale and maximum scale, which is adjustable by the user, and map the metric values (vector lengths) to this interval. In general, such an approach gives a more visually pleasing and clear results, especially when the interval is chosen to be large enough.
+
+The scale of the 3D arrows also reflect the geometrical area of the clusters. The larger the clusters are, the thicker the arrows. Areas are again mapped to a user-defined interval for clearer result. Large clusters are usually important because they represent a trend in a given area and users should be able to see them more easily and also distinguish them from less important arrows.
+
+Lastly, and most importantly, the direction of the representative vector is directly reflected in the direction of the 3D arrow. We have therefore managed to encode three-dimensional information into our visualization.
+
+\subsubsection{Expected Performance}
+
+Arrow visualizations combined with clustering are expected to perform well in answering questions about general trends in large parts of a mesh. They are also expected to perform considerably better than color-based visualizations when asking about the direction of the difference, which is particularly important in cases when the difference forms a very small angle with the surface of the mesh.
+%%-----------------------------------------------------------------------------------------
+\subsection{Cluster Color}
+
+%%-----------------------------------------------------------------------------------------
 \subsection{Thresholding}
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Effect of Clustering Parameters on the Visualizations}
