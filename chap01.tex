@@ -70,28 +70,68 @@ Our clustering method will use the hierarchical algorithm from \citet{Telea99} a
 
 Here is the pseudocode of the hierarchical clustering algorithm as presented in \citet{Telea99}:
 
-\begin{code}[commandchars=\\\{\}]
-ClusterSet s;
-\textbf{for} (all cells cell\textsubscript{i} \textbf{in} dataset)
-\{
-	c = makeCluster(cell\textsubscript{i});
-    set level of c to 0;
-    add c to s;
-\}
+\begin{algorithm}[H]
+\caption{Clustering}
+\begin{algorithmic}[1]
 
-\textbf{for} (all clusters c\textsubscript{i} in s):
-	\textbf{for} (all clusters c\textsubscript{j} neighbours of c\textsubscript{i})
-	\{
-		e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
-        insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
-        mark c\textsubscript{i} and c\textsubscript{j} as NOT_CLUSTERED;
-	\}
-    
-int i = 0;
-...
+\Require ClusterSet s
+\Statex
+\For{all cells cell\textsubscript{i} \textbf{in} dataset}
+	\State c = makeCluster(cell\textsubscript{i});
+    \State set level of c to 0;
+    \State add c to s;
+\EndFor
+\Statex
+\For{all clusters c\textsubscript{i} in s}
+	\For{all clusters c\textsubscript{j} neighbours of c\textsubscript{i}}
+    	\State e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
+        \State insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
+        \State mark c\textsubscript{i} and c\textsubscript{j} as NOT\_CLUSTERED;
+    \EndFor
+\EndFor
+\Statex
+\State int i = 0;
+\For{all pairs (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error in the hash table}
+	\If{both c\textsubscript{i} and c\textsubscript{j} are NOT\_CLUSTERED}
+    	\State c = mergeClusters(c\textsubscript{i}, c\textsubscript{j});
+        set level of c to l++;
+        mark c\textsubscript{i} and c\textsubscript{j} as CLUSTERED;
+        \For{all neighbors n\textsubscript{i} of c}
+        	\State e = clusteringError(c, n\textsubscript{i});
+            insert pair (c, n\textsubscript{i}) in order in hash table
+        \EndFor
+    \EndIf
+\EndFor
+\Statex
+\Return c as root of tree
+\end{algorithmic}
+\end{algorithm}
 
-\end{code}
+There are two important functions in the algorithm, \texttt{clusteringError()} and \texttt{mergeClusters()}. \texttt{clusteringError()} uses formula \ref{eq:clustering_error} to compute the clustering error and therefore directly influence which clustering candidates will be merged first. \texttt{mergeClusters()} constructs the representative vector of the new cluster by computing a weighted average of the representative vectors of the merged clusters where the weight is the geometrical area of the clusters.
+%%-----------------------------------------------------------------------------------------
+\subsection{Improvements}
+
+We also made one modification of the clustering algorithm which can be optionally turned on in the experimental application MeshDiff.
+
+When we consider the surface of a triangle mesh with our vector field placed in the vertices of the mesh, there are two types of vectors - those pointing "inside" the mesh and those pointing "out" of the mesh. We found out that it might be useful to add one more condition to the clustering process and only allow those clusters to be merged whose representative arrows point in the same direction as outlined above. We say that such vectors have the same orientation.
+
+The result of such a clustering is then a forest instead of a tree. This may result in certain clusterings not covering the whole mesh which does not necessarily lower the quality of the resulting visualization but should nevertheless be taken into account.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Proposed Visualizations}
+
+(focus on the visual appearance)
+
+\begin{itemize}
+\item what kind of metrics are used
+\item how is the clustering connected to this
+\item what does it look like and how can the user set it
+\item what is it assumed to be good for 
+\end{itemize}
+
+\subsection{Cluster Color}
+
+\subsection{Arrows}
+
+\subsection{Thresholding}

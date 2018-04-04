@@ -58,6 +58,14 @@
 %% My packages
 \usepackage{verbatim}					% multi-line comments
 \usepackage[list=true]{subcaption}		% subfigures
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{float}						% for floating classes anchor (like algorithm)
+
+%% Set the font of algorithms
+\makeatletter
+\algrenewcommand\ALG@beginalgorithmic{\ttfamily}
+\makeatother
 
 %%% Basic information on the thesis
 
@@ -91,7 +99,7 @@
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, a person who lent the software, etc.)
 \def\Dedication{%
-I would like to thank Ida for being around, Lenka and Petr for being a great support and my supervisor RNDr. Josef Pelikán and my consultant Mgr. Ján Dupej for their feedback and ideas. A special thanks belongs to all volunteers who have participated in the user study.
+I would like to thank Ida, Lenka and Petr for their support and my supervisor RNDr. Josef Pelikán and my consultant Mgr. Ján Dupej for their feedback and ideas. A special thanks belongs to all volunteers who have participated in the user study.
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
