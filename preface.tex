@@ -39,8 +39,6 @@ The disadvantage of these color-based visualizations is that they fail to captur
 \label{fig:morpho_example}
 \end{figure}
 
-Other approaches can be found for example in MeshLab (fig. \ref{fig:meshlab_example}) and CloudCompare (fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly by using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is able to visualize the difference between two arbitrary triangle meshes (or a triangle mesh and a point cloud) by simply finding the nearest triangle to a given point, computing the distance and encoding this metric into color \citep{CloudCmpDistance}. It can also produce a color-based visualization of the difference between two point clouds.
-
 \begin{figure}[h]
 \centering
 	\begin{subfigure}{0.3\textwidth}
@@ -57,6 +55,8 @@ Other approaches can be found for example in MeshLab (fig. \ref{fig:meshlab_exam
 \caption{Visualizations in MeshLab and CloudCompare}
 \end{figure}
 
+Other approaches can be found for example in MeshLab (fig. \ref{fig:meshlab_example}) and CloudCompare (fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly by using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is able to visualize the difference between two arbitrary triangle meshes (or a triangle mesh and a point cloud) by simply finding the nearest triangle to a given point, computing the distance and encoding this metric into color \citep{CloudCmpDistance}. It can also produce a color-based visualization of the difference between two point clouds.
+
 \addtocounter{footnote}{-3}
 \stepcounter{footnote}\footnotetext{Two triangle meshes are homologous if they have the same number of vertices and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(v_i \in Mesh_2\).}
 \stepcounter{footnote}\footnotetext{Finite Element Surface Analysis, captures the difference between corresponding triangle areas}
@@ -66,7 +66,7 @@ Other approaches can be found for example in MeshLab (fig. \ref{fig:meshlab_exam
 %%-----------------------------------------------------------------------------------------
 \section*{Our Goal}
 
-In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create arrow-based visualizations which will be able to display multidimensional information. We will visualize difference metrics from Morphome3cs which are suitable for such visualizations, namely {\it corresponding vertex distance} and {\it corresponding vertex distance projected into the surface normal}. The input of our algorithm will be homologous triangle meshes as in Morphome3cs. We will focus on the visual appearance of devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be carried out to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
+In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create arrow-based visualizations which will be able to display multidimensional information. We will visualize difference metrics from Morphome3cs which are potentially multidimensional and can be represented by an arrow, namely {\it corresponding vertex distance} and {\it corresponding vertex distance projected into the surface normal}. Other metrics which can be represented by an arrow can be easily added. The input of our algorithm will be two homologous triangle meshes as in Morphome3cs. We will focus on the visual appearance of devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be carried out to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------

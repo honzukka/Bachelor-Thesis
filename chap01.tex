@@ -1,14 +1,13 @@
 \chapter{Problem Analysis \& Solution}
 
-Present the solution.
+Our goal is to visualize metrics suitable for arrow visualization, out of which we will restrict ourselves to the following two:
 
-%%-----------------------------------------------------------------------------------------
-%%-----------------------------------------------------------------------------------------
-\section{Seeing Mesh Difference as a Vector Field}
+\begin{itemize}
+\item Corresponding vertex distance
+\item Corresponding vertex distance projected into the surface normal
+\end{itemize}
 
-In our new visualizations, arrows will be used to represent the difference between two triangle meshes. Each arrow will be internally represented by a position and a direction vector. Together, they will form a discrete and bounded vector field. This is a very important abstraction because vector field visualization is a very rich area which finds applications in engineering, molecular modeling and computational fluid dynamics. Therefore, there exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
-
-When visualizing a vector field, it is necessary to use clustering on the vectors to obtain a simplified representation, otherwise the visualization becomes too cluttered (see fig. \ref{fig:meshdiff_unclustered}). Clustering therefore determines to a large extent what the final visualization will look like.
+Other metrics can be easily added if needed. Both of the chosen metrics can be represented by a vector. Our input to the visualization part of the process will therefore be two homologous triangle meshes with vectors saved in each vertex. Drawing these vectors directly on the screen would be counter-productive as the visualization would become too cluttered (see fig. \ref{fig:meshdiff_unclustered}). The solution is to come up with a simple abstraction for this situation and use tools available for that abstraction.
 
 \begin{figure}[h]
 \centering
@@ -16,12 +15,22 @@ When visualizing a vector field, it is necessary to use clustering on the vector
 \caption{MeshDiff - Vertex distance visualized by unclustered arrows}
 \label{fig:meshdiff_unclustered}
 \end{figure}
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Seeing Mesh Difference as a Vector Field}
+
+Vectors saved in the vertices of a triangle mesh form a discrete bounded vector field. Visualization of discrete vector fields is a very active research area with applications in engineering, molecular modelling and computational fluid dynamics. There exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
+
+All the above mentioned papers employ clustering to reduce the number of vectors and subsequently visualize this reduced and generalized information.
+
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Vector Field Clustering}
 
-As clustering is a very subjective task (see fig. \ref{fig:clustering_subjectivity}), each of the above mentioned papers has their own way of dealing with it.
+Clustering in general is a very subjective task (see fig. \ref{fig:clustering_subjectivity}) and there are numerous clustering techniques available. For this reason we present an overview of them to gain a better understanding of which technique might best suit our purposes and why.
 
 \begin{figure}[h]
 \centering
