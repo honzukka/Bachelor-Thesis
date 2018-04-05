@@ -147,8 +147,62 @@ Arrow visualizations combined with clustering are expected to perform well in an
 %%-----------------------------------------------------------------------------------------
 \subsection{Cluster Color}
 
+There are situations when the user requires clustering in order to see how larger parts of the meshes differ from one another but the richness of information offered by the arrow visualization is redundant. Also, one might simply want to see how the clustering itself behaves. For these use case we introduce two color visualizations of clusters - random and metric-based.
+
+Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied on clusters.
+
+\subsubsection{Expected Performance}
+
+Random cluster color is expected to be used for the purpose of configuring the clustering parameters as the size and the location of the clusters is clearly visible in this case.
+
+Metric-based cluster color is expected to perform well in cases when we have found the most important differences using a more sophisticated visualization and want to present those using a visualization which is as clear as possible.
 %%-----------------------------------------------------------------------------------------
 \subsection{Thresholding}
 
+For all types of metric-based visualizations, including the original color-based ones, we present thresholding. Each vertex or cluster which does not have a sufficiently high metric value assigned to it is excluded from the visualization. This method therefore works as a high-pass filter on the visualization.
+
+\subsubsection{Expected Performance}
+
+Thresholding is expected to enhance the effect of metric-based cluster color in that it is expected to perform very well when segmenting and emphasizing a previously discovered difference which is of importance to the user. It is also expected to help answer questions about the largest differences in the mesh.
 %%-----------------------------------------------------------------------------------------
-\subsection{Effect of Clustering Parameters on the Visualizations}
+\subsection{Combined Visualizations}
+
+The last visualization type presented in this thesis is the combination of color and arrow visualizations.
+
+\subsubsection{Expected Performance}
+
+Combined visualizations complement each other in areas when only one visualization is not sufficiently clear. Color visualizations are expected to highlight the dimension of the metric we are interested in the most, for example vertex distance magnitude, while arrow visualization are expected to carry the other dimensions like direction and cluster size. This method is expected to bring a balance between clarity and information richness.
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Effect of Clustering Parameters on the Visualizations}
+
+(include visualizer parameters in the descriptions above)
+
+The function used for computing the clustering error (see eq. \ref{eq:clustering_error}) has four parameters:
+
+\begin{itemize}
+\item Direction weight
+\item Position weight
+\item Magnitude weight
+\item Resolution weight
+\end{itemize}
+
+A specific configuration of these parameters can influence the outcome of the clustering process considerably. Setting the value of one of them higher than the others will cause the proportion of the corresponding part of the clustering error be higher than the others. This will make that part of the error more significant and cause cluster pair with low values in this area merge much easier than all the other cluster pairs.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Direction Weight}
+
+High direction weight causes clusters whose representative vectors have similar directions merge easily regardless of their difference in position, magnitude and resolution. This results in uneven cluster sizes. It forms many small clusters in areas of high surface curvature and large clusters in flat areas. Therefore, it mostly captures the high-curvature changes of shape.
+%%-----------------------------------------------------------------------------------------
+\subsection{Position Weight}
+
+Setting the position weight higher than others results in clusters of even size where each of them represents the overall difference in a certain area regardless of the variety of directions and magnitudes in that area.
+%%-----------------------------------------------------------------------------------------
+\subsection{Magnitude Weight}
+
+Magnitude weight can play a significant role when using the metric-based cluster color visualization because its high value will highlight iso-magnitude contours. Such an approach can be useful when grouping and segmenting areas with a certain absolute value of the difference metric.
+%%-----------------------------------------------------------------------------------------
+\subsection{Resolution Weight}
+
+High resolution weight prefers clustering in sparse areas of the mesh and will therefore increase the precision of the visualization in very dense areas. This effect partially complement direction weight because high-curvature areas of triangle meshes are usually more dense for the high-curvature to be captured well.
