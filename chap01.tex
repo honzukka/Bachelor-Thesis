@@ -23,7 +23,7 @@ Other metrics can be easily added if needed. Both of the chosen metrics can be r
 
 Vectors saved in the vertices of a triangle mesh form a discrete bounded vector field. Visualization of discrete vector fields is a very active research area with applications in engineering, molecular modelling and computational fluid dynamics. There exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
 
-All the above mentioned papers employ clustering to reduce the number of vectors and subsequently visualize this reduced and generalized information.
+All the above mentioned papers employ clustering techniques to reduce the number of vectors and subsequently visualize this reduced and generalized information.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -42,13 +42,21 @@ Clustering in general is a very subjective task (see fig. \ref{fig:clustering_su
 %%-----------------------------------------------------------------------------------------
 \subsection{Overview of Vector Field Clustering Methods}
 
-\citet{Telea99} use hierarchical (bottom-up) clustering where neighboring clusters with the smallest clustering error are merged. Each cluster has a representative vector and when merging, a weighted average of the two vectors is computed and assigned to the newly formed cluster. The paper introduced elliptic iso-error contours to compute the clustering error. The method is primarily aimed at 2D rectilinear vector fields but can be also used in 3D.
+\citet{Telea99} use hierarchical clustering\footnotemark where neighboring clusters with the lowest clustering error are merged first. Each cluster has a representative vector and during the merge, the weighted average of the two vectors is computed and assigned to the newly formed cluster. In order to compute the clustering error, the paper introduced elliptic iso-error contours\footnotemark. This clustering method is primarily aimed at 2D rectilinear vector fields but can be also used in 3D when the error function is modified appropriately. It is possible to use up to seven parameters to configure the clustering.
 
-\citet{Garcke00} use a continuous clustering method based on the physical model of \citet{CahnHilliard58} which is used to describe phase separation and coarsening in binary alloys. This model is applied to vector field data which results in a diffusion problem rather than a splitting and merging problem. Such an algorithm also presumes an either 2D or 3D rectilinear grid.
+\footnotetext{Hierarchical clustering, also called bottom-up clustering, starts with each data point representing an elementary cluster. In each step of the algorithm, two clustering candidates are found from the available clusters according to certain criteria and subsequently merged. Hierarchical clustering creates a clustering tree, also called a dendrogram, where the each node represents a cluster and has two children from whose it was created. Once such a tree is computed, it is very easy to retrieve a clustering of the data points containing any given number of clusters.}
 
-\citet{Du04} use iterative (top-down) clustering where Voronoi regions are created around the initial cluster centers and a distance function is applied to each of them. The set of cluster centers which has the lowest value of the distance function is selected as the final cluster centers set. This method works with 2D and 3D rectilinear vector fields.
+\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the "distance" between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same "distance" from \(v\). The shape of the ellipse and its center location can be controlled by parameters.}
 
-\citet{Peng12} use hierarchical clustering similar to \citet{Telea99}, only they use the GPU to compute the clustering by encoding a certain static view of a mesh into a rasterized image. The computation is then done for this specific image. To obtain the clustering error, a very simple formula is employed:
+\citet{Garcke00} use a continuous clustering method\footnotemark based on the physical model of \citet{CahnHilliard58} which is used to describe phase separation and coarsening in binary alloys. This model is applied to vector field data which results in a diffusion problem rather than a splitting and merging problem. Their algorithm also presumes an either 2D or 3D rectilinear grid.
+
+\footnotetext{In continuous clustering methods, there is no notion of merging or splitting in each step of the algorithm. Instead, ``a continuous scale of successively coarser cluster sets" is created.}
+
+\citet{Du04} use iterative clustering\footnotemark where Voronoi regions are created around the initial cluster centers and a distance function is applied to each of them. The set of cluster centers which has the lowest value of the distance function is selected as the final cluster centers set. This method works with 2D and 3D rectilinear vector fields. Clustering can be influenced by two parameters and by the distribution of the initial clusters.
+
+\footnotetext{Iterative clustering algorithms start by assigning the data points to a given number of clusters in a random way or by using a clustering approximation. In each step, the clustering error of all clusters is computed and data points are reassigned in a way which decreases the overall clustering error.}
+
+\citet{Peng12} use hierarchical clustering similar to \citet{Telea99}. However, the clustering is computed on a GPU by encoding a given static view of the two meshes into a rasterized image. The computation is then done for this specific image. To obtain the clustering error, a very simple formula is used:
 
 \begin{equation} \label{eq:clustering_error}
 \bm{e}(C_1,C_2) = k_d \cdot \frac{d_{C_1C_2}}{d_{max}} + k_v \cdot \frac{v_{C_1C_2}}{v_{max}} + k_\alpha \cdot \frac{\alpha_{C_1C_2}}{\alpha_{max}} + k_m \cdot \frac{m_{C_1C_2}}{m_{max}}
@@ -63,11 +71,19 @@ where \(k_d + k_v + k_\alpha + k_m = 1\). The other components are the following
 \item \(m_{C_1C_2}\) is the sum of the mesh resolutions of the two clusters. \(m_{max}\) is the largest value of \(m\) in the whole data set.
 \end{itemize}
 
-The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D meshes.
+The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D meshes and has five parameters for user configuration (four weights and the number of clusters).
 %%-----------------------------------------------------------------------------------------
 \subsection{Our Clustering Method}
 
-For our clustering purposes, it is convenient to choose one of the presented methods and modify it if necessary. This approach saves time and gives us a baseline which we can improve upon. When selecting a clustering method, it is necessary to find a balance between simplicity and the ease of use (parameter tuning). We will lean towards simplicity in order to quickly obtain our baseline and only later look for improvements once we have a better idea of the actual performance of the selected method in our conditions.
+For our visualization purposes, we will choose one of the presented clustering methods and modify it if necessary. This approach saves time and gives us a baseline which we can improve upon. When selecting a clustering method, we will have the following criteria (in order of importance):
+
+\begin{enumerate}
+\item Suitability for the specifics of our vector field
+\item Simplicity
+\item Ease of user configuration
+\end{enumerate}
+
+Methods which are suitable for our specific vector field (a triangle mesh with a vector in each vertex) will help us tailor the clustering process to achieve better results. Simple methods will allow us to quickly obtain a baseline which will help us to decide which modifications will improve the algorithm in our conditions. Lastly, the ease of configuration will make our algorithm user friendly and therefore increase the adoption rate.
 
 While the hierarchical clustering of \citet{Telea99} is very simple and seems like a good candidate, its error function does not take into account the varying density of our triangle meshes and is also more demanding to use in 3D. In order to calculate the error function, one needs to find the elliptic iso-error contour of a given vector. This leads to cube-root equations which would have to be computed for every pair of clustering candidates. The error function of \citet{Peng12} (see eq. \ref{eq:clustering_error}), on the other hand, is both sensitive to non-uniform meshes and computationally simpler and more scalable into higher dimensions.
 
