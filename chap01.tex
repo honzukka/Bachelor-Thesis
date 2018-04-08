@@ -11,7 +11,7 @@ Other metrics can be easily added if needed. All metrics suitable for arrow visu
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{./img/meshdiff-unclustered_arrows.PNG}
+\includegraphics[width=0.5\textwidth]{./img/meshdiff-unclustered_arrows-single.png}
 \caption{MeshDiff - Vertex distance visualized by unclustered arrows}
 \label{fig:meshdiff_unclustered}
 \end{figure}
@@ -119,11 +119,39 @@ Here we present the descriptions of the new visualizations which are based on th
 
 Once a clustering of the mesh difference vector field is obtained, representative vectors of all clusters are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow which is copied to the scene at a specific position and a specific scale given by the representative vector and the cluster it belongs to.
 
-The length of the representative vector encodes the difference metric now averaged across the whole cluster. This length also influences the scale of the 3D arrow. Because the values of the metric can be very close to zero and because their value range is not generally very large, we have decided set a certain minimum scale and maximum scale, which is adjustable by the user, and map the metric values (vector lengths) to this interval. In general, such an approach gives a more visually pleasing and clear results, especially when the interval is chosen to be large enough.
+The length of the representative vector encodes the difference metric, now averaged across the whole cluster. This length also influences the scale of the 3D arrow. Because the values of the metric can be very close to zero and because their value range is not generally very large, we have decided set a certain minimum scale and maximum scale, which is adjustable by the user, and map the metric values (vector lengths) to this interval. In general, such an approach gives a more visually pleasing and clear results, especially when the interval is chosen to be large enough.
 
-The scale of the 3D arrows also reflect the geometrical area of the clusters. The larger the clusters are, the thicker the arrows. Areas are again mapped to a user-defined interval for clearer result. Large clusters are usually important because they represent a trend in a given area and users should be able to see them more easily and also distinguish them from less important arrows.
+The scale of the 3D arrows also reflects the geometrical area of the clusters. The larger the clusters are, the thicker the arrows. Areas are again mapped to a user-defined interval for clearer result. Large clusters are usually important because they represent a trend in a given area and users should be able to see them more easily and also distinguish them from less important arrows.
 
 Lastly, and most importantly, the direction of the representative vector is directly reflected in the direction of the 3D arrow. We have therefore managed to encode three-dimensional information into our visualization.
+
+\begin{figure}[h]
+\centering
+	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-5-count20-single.png}
+    \caption{Smallest height \& width scale: \(0.5\); largest height \& width scale: 5; cluster count: 20}
+    \label{fig:meshdiff_arrows_5-20}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-5-count125-single.png}
+    \caption{Smallest height \& width scale: \(0.5\); largest height \& width scale: 5; cluster count: 125}
+    \label{fig:meshdiff_arrows_5-125}
+	\end{subfigure}
+    
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-1-count20-single.png}
+    \caption{Smallest height \& width scale: \(0.5\); largest height \& width scale: 1; cluster count: 20}
+    \label{fig:meshdiff_arrows_1-20}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-1-count125-single.png}
+    \caption{Smallest height \& width scale: \(0.5\); largest height \& width scale: 1; cluster count: 125}
+    \label{fig:meshdiff_arrows_1-125}
+	\end{subfigure}
+\caption{MeshDiff - Arrow visualizations with various parameter settings}
+\end{figure}
 
 \subsubsection{Expected Performance}
 
@@ -135,6 +163,23 @@ There are situations when the user requires clustering in order to see how large
 
 Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied on clusters.
 
+\begin{figure}[h]
+\centering
+	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-clustercolor-random.PNG}
+    \caption{Random cluster colors}
+    \label{fig:meshdiff_clustercolor_random}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-clustercolor-metric.PNG}
+    \caption{Metric-based cluster colors}
+    \label{fig:meshdiff_clustercolor_metric}
+	\end{subfigure}
+    
+\caption{MeshDiff - Cluster color visualizations}
+\end{figure}
+
 \subsubsection{Expected Performance}
 
 Random cluster color is expected to be used for the purpose of configuring the clustering parameters as the size and the location of the clusters is clearly visible in this case.
@@ -145,6 +190,23 @@ Metric-based cluster color is expected to perform well in cases when we have fou
 
 For all types of metric-based visualizations, including the original color-based ones, we present thresholding. Each vertex or cluster which does not have a sufficiently high metric value assigned to it is excluded from the visualization. This method therefore works as a high-pass filter on the visualization.
 
+\begin{figure}[h]
+\centering
+	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-thresholding-clustercolor-length3.PNG}
+    \caption{Clusters with distance less than 3 grayed out}
+    \label{fig:meshdiff_thresholding_clustercolor}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-thresholding-arrows-length3.PNG}
+    \caption{Arrows for cluster with distance less than 3 excluded}
+    \label{fig:meshdiff_thresholding_arrows}
+	\end{subfigure}
+    
+\caption{MeshDiff - Thresholded visualizations}
+\end{figure}
+
 \subsubsection{Expected Performance}
 
 Thresholding is expected to enhance the effect of metric-based cluster color in that it is expected to perform very well when segmenting and emphasizing a previously discovered difference which is of importance to the user. It is also expected to help answer questions about the largest differences in the mesh.
@@ -153,6 +215,13 @@ Thresholding is expected to enhance the effect of metric-based cluster color in 
 
 The last visualization type presented in this thesis is the combination of color and arrow visualizations.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{./img/meshdiff-combination.PNG}
+\caption{MeshDiff - Combined visualization}
+\label{fig:meshdiff_combination}
+\end{figure}
+
 \subsubsection{Expected Performance}
 
 Combined visualizations complement each other in areas when only one visualization is not sufficiently clear. Color visualizations are expected to highlight the dimension of the metric we are interested in the most, for example vertex distance magnitude, while arrow visualization are expected to carry the other dimensions like direction and cluster size. This method is expected to bring a balance between clarity and information richness.
@@ -160,8 +229,6 @@ Combined visualizations complement each other in areas when only one visualizati
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Effect of Clustering Parameters on the Visualizations}
-
-(include visualizer parameters in the descriptions above)
 
 The function used for computing the clustering error (see eq. \ref{eq:clustering_error}) has four parameters:
 
@@ -190,3 +257,31 @@ Magnitude weight can play a significant role when using the metric-based cluster
 \subsection{Resolution Weight}
 
 High resolution weight prefers clustering in sparse areas of the mesh and will therefore increase the precision of the visualization in very dense areas. This effect partially complement direction weight because high-curvature areas of triangle meshes are usually more dense for the high-curvature to be captured well.
+
+\begin{figure}[h]
+\centering
+	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-high_direction.PNG}
+	\caption{High direction weight}
+	\label{fig:meshdiff_high_direction}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-high_position.PNG}
+	\caption{High position weight}
+	\label{fig:meshdiff_high_position}
+	\end{subfigure}
+    
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-high_magnitude.PNG}
+	\caption{High magnitude weight}
+	\label{fig:meshdiff_high_magnitude}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/meshdiff-high_resolution.PNG}
+	\caption{High resolution weight}
+	\label{fig:meshdiff_high_resolution}
+	\end{subfigure}
+\caption{MeshDiff - Various clustering parameter settings}
+\end{figure}
