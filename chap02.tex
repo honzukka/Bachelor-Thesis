@@ -8,3 +8,40 @@ In-depth explanation of the solution. (Developer documentation.)
 \item Mention how it is all put together in the application
 \item Talk about loading/saving parameters/visualizations
 \end{itemize}
+
+\begin{algorithm}[H]
+\caption{Clustering}
+\begin{algorithmic}[1]
+
+\Require ClusterSet c
+\Statex
+\For{all cells cell\textsubscript{i} \textbf{in} dataset}
+	\State c = makeCluster(cell\textsubscript{i});
+    \State set level of c to 0;
+    \State add c to s;
+\EndFor
+\Statex
+\For{all clusters c\textsubscript{i} in s}
+	\For{all clusters c\textsubscript{j} neighbours of c\textsubscript{i}}
+    	\State e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
+        \State insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
+        \State mark c\textsubscript{i} and c\textsubscript{j} as NOT\_CLUSTERED;
+    \EndFor
+\EndFor
+\Statex
+\State int i = 0;
+\For{all pairs (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error in the hash table}
+	\If{both c\textsubscript{i} and c\textsubscript{j} are NOT\_CLUSTERED}
+    	\State c = mergeClusters(c\textsubscript{i}, c\textsubscript{j});
+        set level of c to l++;
+        mark c\textsubscript{i} and c\textsubscript{j} as CLUSTERED;
+        \For{all neighbors n\textsubscript{i} of c}
+        	\State e = clusteringError(c, n\textsubscript{i});
+            insert pair (c, n\textsubscript{i}) in order in hash table
+        \EndFor
+    \EndIf
+\EndFor
+\Statex
+\Return c as root of tree
+\end{algorithmic}
+\end{algorithm}

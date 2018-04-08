@@ -7,7 +7,7 @@ Our goal is to visualize metrics suitable for arrow visualization, out of which 
 \item Corresponding vertex distance projected into the surface normal
 \end{itemize}
 
-Other metrics can be easily added if needed. Both of the chosen metrics can be represented by a vector. Our input to the visualization part of the process will therefore be two homologous triangle meshes with vectors saved in each vertex. Drawing these vectors directly on the screen would be counter-productive as the visualization would become too cluttered (see fig. \ref{fig:meshdiff_unclustered}). The solution is to come up with a simple abstraction for this situation and use tools available for that abstraction.
+Other metrics can be easily added if needed. All metrics suitable for arrow visualization can be represented by a vector. Our input to the visualization part of the process will therefore be two homologous triangle meshes with vectors saved in each vertex. Drawing these vectors directly on the screen would be counter-productive as the visualization would become too cluttered (see fig. \ref{fig:meshdiff_unclustered}). The solution is to come up with a simple abstraction for this situation and use tools available for that abstraction.
 
 \begin{figure}[h]
 \centering
@@ -73,87 +73,46 @@ where \(k_d + k_v + k_\alpha + k_m = 1\). The other components are the following
 
 The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D meshes and has five parameters for user configuration (four weights and the number of clusters).
 %%-----------------------------------------------------------------------------------------
-\subsection{Our Clustering Method}
+\subsection{Selection Criteria for Our Clustering Method}
 
-For our visualization purposes, we will choose one of the presented clustering methods and modify it if necessary. This approach saves time and gives us a baseline which we can improve upon. When selecting a clustering method, we will have the following criteria (in order of importance):
+For our visualization purposes, we will draw inspiration from the presented clustering methods and introduce certain modifications to accommodate our needs. Here are the criteria for choosing our clustering method:
 
-\begin{enumerate}
+\begin{itemize}
 \item Suitability for the specifics of our vector field
 \item Simplicity
-\item Ease of user configuration
-\end{enumerate}
+\item Ease of use
+\end{itemize}
 
-Methods which are suitable for our specific vector field (a triangle mesh with a vector in each vertex) will help us tailor the clustering process to achieve better results. Simple methods will allow us to quickly obtain a baseline which will help us to decide which modifications will improve the algorithm in our conditions. Lastly, the ease of configuration will make our algorithm user friendly and therefore increase the adoption rate.
+Methods which are suitable for our specific vector field (a triangle mesh with a vector in each vertex) will help us tailor the clustering process to achieve better results. Simple methods will allow us to quickly obtain a baseline which will help us to decide which modifications will improve the algorithm in our conditions. Lastly, the ease of configuration will make our algorithm user friendly and therefore it will increase the adoption rate.
 
-While the hierarchical clustering of \citet{Telea99} is very simple and seems like a good candidate, its error function does not take into account the varying density of our triangle meshes and is also more demanding to use in 3D. In order to calculate the error function, one needs to find the elliptic iso-error contour of a given vector. This leads to cube-root equations which would have to be computed for every pair of clustering candidates. The error function of \citet{Peng12} (see eq. \ref{eq:clustering_error}), on the other hand, is both sensitive to non-uniform meshes and computationally simpler and more scalable into higher dimensions.
-
-Lastly, we will not use the GPU-based clustering computation from \citet{Peng12} because we need to be able to view the resulting visualizations easily from various angles in real time. The basic approach in \citet{Telea99} computes the clustering once for the whole vector field.
-
-Our clustering method will use the hierarchical algorithm from \citet{Telea99} and the error function \ref{eq:clustering_error} from \citet{Peng12}. Merging of two clusters will be done by computing a weighted average of their representative vectors.
 %%-----------------------------------------------------------------------------------------
-\subsection{Algorithm}
+\subsection{Our Clustering Method}
 
-Here is the pseudocode of the hierarchical clustering algorithm as presented in \citet{Telea99}:
+We will now describe our clustering method.
 
-\begin{algorithm}[H]
-\caption{Clustering}
-\begin{algorithmic}[1]
+\subsubsection{Clustering Algorithm}
 
-\Require ClusterSet s
-\Statex
-\For{all cells cell\textsubscript{i} \textbf{in} dataset}
-	\State c = makeCluster(cell\textsubscript{i});
-    \State set level of c to 0;
-    \State add c to s;
-\EndFor
-\Statex
-\For{all clusters c\textsubscript{i} in s}
-	\For{all clusters c\textsubscript{j} neighbours of c\textsubscript{i}}
-    	\State e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
-        \State insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
-        \State mark c\textsubscript{i} and c\textsubscript{j} as NOT\_CLUSTERED;
-    \EndFor
-\EndFor
-\Statex
-\State int i = 0;
-\For{all pairs (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error in the hash table}
-	\If{both c\textsubscript{i} and c\textsubscript{j} are NOT\_CLUSTERED}
-    	\State c = mergeClusters(c\textsubscript{i}, c\textsubscript{j});
-        set level of c to l++;
-        mark c\textsubscript{i} and c\textsubscript{j} as CLUSTERED;
-        \For{all neighbors n\textsubscript{i} of c}
-        	\State e = clusteringError(c, n\textsubscript{i});
-            insert pair (c, n\textsubscript{i}) in order in hash table
-        \EndFor
-    \EndIf
-\EndFor
-\Statex
-\Return c as root of tree
-\end{algorithmic}
-\end{algorithm}
+The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for a certain number of clusters for given clustering parameters. Hierarchical clustering will also make our approach user-friendly. We will, however, introduce one optional condition to which clusters can be merged together. Since our vector fields are placed on the surface of a triangle mesh, a vector can either point "inside" or "outside" depending on how we name the surrounding half-spaces. Because this might be important to the user, our clustering candidates have to not only be neighbors but also have the same orientation. The user will be able to disable this condition because the resulting dendrogram is not a tree but a forest. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set.
 
-There are two important functions in the algorithm, \texttt{clusteringError()} and \texttt{mergeClusters()}. \texttt{clusteringError()} uses formula \ref{eq:clustering_error} to compute the clustering error and therefore directly influence which clustering candidates will be merged first. \texttt{mergeClusters()} constructs the representative vector of the new cluster by computing a weighted average of the representative vectors of the merged clusters where the weight is the geometrical area of the clusters.
-%%-----------------------------------------------------------------------------------------
-\subsection{Improvements}
+We are not going to use the GPU-based approach to clustering computations from \citet{Peng12} because it does not allow the user to view the final visualization from varying angles in real time. While one of our motivations is to have good visualizations for publishing in scientific papers, the possibility of viewing the visualizations in real time will allow the user find the ideal viewing angle more easily since it might not be known prior to the visualization process. We will store our vector field in memory and compute the clustering on the whole field in one process (similar to \citet{Telea99}).
 
-We also made one modification of the clustering algorithm which can be optionally turned on in the experimental application MeshDiff.
+\subsubsection{Clustering Error Function}
 
-When we consider the surface of a triangle mesh with our vector field placed in the vertices of the mesh, there are two types of vectors - those pointing "inside" the mesh and those pointing "out" of the mesh. We found out that it might be useful to add one more condition to the clustering process and only allow those clusters to be merged whose representative arrows point in the same direction as outlined above. We say that such vectors have the same orientation.
+The error function presented in \citet{Peng12} (see Eq. \ref{eq:clustering_error}) is the only one which assumes vector fields on other than rectilinear grids. Its mesh resolution component makes it suitable to use in the clustering of vector fields on triangle meshes. The function is also simpler and more easily scalable than the elliptic iso-error contours presented in \citet{Telea99} which lead to cube root equations in 3D.
 
-The result of such a clustering is then a forest instead of a tree. This may result in certain clusterings not covering the whole mesh which does not necessarily lower the quality of the resulting visualization but should nevertheless be taken into account.
+\subsubsection{Cluster Merging}
+
+Besides clustering error computation, merging is the second crucial part of a hierarchical clustering algorithm. In the clustering of vector fields, a representative vector is usually assigned to a newly formed cluster. In our case, this shall be a weighted average of the representative vectors of the child clusters where the weight will be the geometrical area of the given cluster. Geometrical area is a better metric for cluster size than data point count because our underlying triangle mesh can have variable density.
+
+\subsubsection{Summary}
+
+Our clustering method will use the hierarchical algorithm and vector field representation from \citet{Telea99} with the added optional condition of merging only clusters with the same representative vector orientation relative to the mesh surface. We will use the error function \ref{eq:clustering_error} from \citet{Peng12}. Merging of two clusters will be done by computing an area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Proposed Visualizations}
 
-Since our new visualizations are mostly arrow-based, we have chosen to visualize the following distance metrics:
-
-\begin{itemize}
-\item Vertex distance
-\item Vertex distance projected into surface normal
-\end{itemize}
-
-Following are the descriptions of the new visualizations.
+Here we present the descriptions of the new visualizations which are based on the clustering process outlined above.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Arrows}
