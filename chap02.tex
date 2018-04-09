@@ -65,6 +65,7 @@ A list of \verb+Arrow+ instances indexed by the handles of the corresponding ver
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Data Point Clustering}
+\label{sec:implementation_clustering}
 
 As mentioned in \ref{sec:analysis_clustering_algorithm}, our clustering has multiple types. For the sake of consistency, we also introduce a third type, the empty clustering, which does not reduce the number of data points in any way and can be used when no clustering is needed. Each clustering type has an associated class, all of which share a common interface.
 
@@ -177,6 +178,39 @@ A list of \verb+Cluster+ instances is returned, even in the case of empty cluste
 %%-----------------------------------------------------------------------------------------
 \subsection{Data Point Visualization}
 
+In section \ref{sec:analysis_visualizations}, we have proposed several types of visualizations. Each of them has an associated class in MeshDiff which generates it based on \verb+Cluster+ instances supplied to it. There are two interfaces which these visualizer classes can implement, depending on whether they produce arrow-based or color-based visualizations. Objects of these classes are passed to the \verb+CreateVisualization()+ method which stores the visualizations in the \verb+DiffVector+ object. Because arrow-based and color-based visualizations can be combined into one, \verb+CreateVisualization()+ accepts two visualizer parameters, one for each interface. At least one of them should be provided for the \verb+DiffVector+ class to generate a visualization.
+
+We will now focus on the visualizers of the two interfaces separately.
+
+\subsubsection{Arrow Visualizers}
+
+Arrow visualizer objects only have one field which is initialized in the constructor. This field hold a basic triangle mesh representing a 3D arrow. This arrow was created manually in order to have the least amount of vertices and triangles possible. It has 17 vertices and 16 triangles. The tip of the arrow is an eight-sided pyramid which has a much better appearance than the basic four-sided pyramid.
+
+\begin{figure}[h]
+\centering
+	\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/4sided_arrow.PNG}
+    \caption{Four-sided tip version (not used)}
+    \label{fig:4sided_arrow}
+	\end{subfigure}
+    \qquad
+    \begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\textwidth]{./img/8sided_arrow.PNG}
+    \caption{Eight-sided tip version (used)}
+    \label{fig:8sided_arrow}
+	\end{subfigure}
+\caption{Wireframe models used for arrow visualizations}
+\end{figure}
+
+The visualizer receives a list of clusters as input, loops through them and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{sec:analysis_visualizations}. An output triangle mesh containing all the created copies is then outputted.
+
+\subsubsection{Color Visualizers}
+
+For each mode mentioned in section \ref{sec:analysis_visualizations} (i.e. random, cluster relative, cluster absolute, etc.), there is a separate visualizer class implementing the color visualizer interface. This determines how color is assigned to vertices. In general, each visualizer loops though all clusters supplied and for each of them it generates a color based on the metric value for that cluster. Once a color is created, it is inserted into a list at precisely those indices which belong to the primary data points (see section \ref{sec:implementation_clustering}) of the associated cluster in the {\it scene representation} of the underlying triangle mesh. It is important to respect this indexing in order to make the mapping of the colors to the mesh vertices easier in the \verb+BakeVisualization()+ method of the \verb+DiffVector+ class. This list is then outputted.
+
+\subsubsection{Output}
+
+Either a triangle mesh or a list of triplets representing colors is outputted based on the type of the visualization.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------

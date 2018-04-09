@@ -112,6 +112,7 @@ Our clustering method will use the hierarchical algorithm and vector field repre
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Proposed Visualizations}
+\label{sec:analysis_visualizations}
 
 Here we present the descriptions of the new visualizations which are based on the clustering process outlined above.
 
@@ -163,6 +164,12 @@ Arrow visualizations combined with clustering are expected to perform well in an
 There are situations when the user requires clustering in order to see how larger parts of the meshes differ from one another but the richness of information offered by the arrow visualization is redundant. Also, one might simply want to see how the clustering itself behaves. For these use case we introduce two color visualizations of clusters - random and metric-based.
 
 Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied on clusters.
+
+We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point "inwards" and "outwards". What differs is the shade assigned to clusters of specific metric value.
+
+In the relative mode, the highest and lowest metric values are taken first. The lowest value receives a black color and the highest value receives the brightest user-defined color. All other values are mapped to this interval and receive a color which is a proportional mixture of the user-defined color and black.
+
+In the absolute mode, black color is assigned to cluster of zero metric value and the brightest color is assigned to clusters of metric value higher or equal than a user-defined value. This allows the user to compare across several visualizations and determine the absolute value of the difference metric more easily.
 
 \begin{figure}[h]
 \centering
