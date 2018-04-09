@@ -1,13 +1,137 @@
 \chapter{Implementation}
 
-In-depth explanation of the solution. (Developer documentation.)
+In this chapter we will describe the implementation details of the MeshDiff program. We will explain how triangle meshes are represented in the program and we will talk about the following three steps of the visualization algorithm:
 
 \begin{itemize}
-\item Thoroughly describe the clustering techniques used
-\item Thoroughly describe the new visualization methods
-\item Mention how it is all put together in the application
-\item Talk about loading/saving parameters/visualizations
+\item Difference metric computation
+\item Data point clustering
+\item Data point visualization
 \end{itemize}
+
+We will also mention technical details of the user interface, namely how the visualization process is configured, launched and how the resulting visualizations are presented to the user.
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Visualization Algorithm}
+
+The core class of MeshDiff which encapsulates the visualization algorithm is called \verb+DiffVector+. The name of the class suggests that it is able to work with difference metrics which can be represented by a vector, more specifically a 3D vector. \verb+DiffVector+ is initialized by data of the two meshes to be compared and therefore only operates on these two specific meshes throughout its whole lifetime.
+
+The main public methods of \verb+DiffVector+ are \verb+CreateVisualization()+ and \verb+BakeVisualization()+. \verb+CreateVisualization()+ is responsible for metric computation, data point clustering and the generation of a visualization. This visualization is then stored inside the \verb+DiffVector+ class and can be obtained by copying it into an output triangle mesh in the \verb+BakeVisualization()+ method.
+
+This approach ensures that all intermediate results which are difficult to compute like data point clustering and visualization data can be stored inside the \verb+DiffVector+ class and quickly retrieved later if necessary. When a new visualization is created on the same pair of meshes, all intermediate results which can be reused are reused and only the ones which change are computed.
+
+The fact that visualizations are outputted in the form of triangle meshes makes it easy to display, load and store the visualizations using standard triangle mesh methods and formats.
+
+We will now present all steps of the visualization process in more detail.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Triangle Mesh Representation}
+
+We are using the implementation of a boundary representation of a triangle mesh with a corner table which was presented in \citet{Corner03}. The implementation was created by Josef Pelikán. For brevity, we will refer to this representation as a {\it scene representation}\footnotemark.
+
+\footnotetext{In this representation, we do not store the vertices of the triangle mesh but the corners of the triangles. Corner table then allows us to obtain the neighboring as well as opposite corners of a given corner and associated vertices in constant time. This makes traversing an arbitrary triangle mesh very simple and fast.}
+
+We have added several methods to this implementation in order for us to be able to quickly obtain the list of neighbors of a given vertex and compute the geometrical area of clusters.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Difference Metric Computation}
+\label{sec:analysis_metric}
+
+This step of the visualization process can be configured by a parameter passed to the \verb+CreateVisualization()+ method. \verb+DiffVector+ remembers the current metric which it has computed and this determines whether it will be reused or whether a new one will be computed.
+
+As mentioned earlier, we have included two difference metric in MeshDiff, both of which can be represented by a 3D vector:
+
+\begin{itemize}
+\item Corresponding vertex distance
+\item Corresponding vertex distance projected into the surface normal
+\end{itemize}
+
+We have created a common representation for for both of these metrics called \verb+Arrow+ which acts as a data point, an input to the clustering algorithm.
+
+Here are the most important fields of an \verb+Arrow+:
+
+\begin{itemize}
+\item Origin - a 3D vector representing the position of the vector metric and initially coincides with the coordinates of the corresponding vertex
+\item Direction - a 3D vector representing the metric itself
+\item Orientation - tells whether the arrow points "inside" or "outside" the triangle mesh or if the orientation is unknown
+\end{itemize}
+
+During this step, all corresponding vertices of both meshes are enumerated and for each pair, a corresponding metric is computed using the {\it scene representation}.
+
+\subsubsection{Output}
+
+A list of \verb+Arrow+ instances indexed by the handles of the corresponding vertices in the {\it scene representation}.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Data Point Clustering}
+
+As mentioned in \ref{sec:analysis_clustering_algorithm}, our clustering has multiple types. For the sake of consistency, we also introduce a third type, the empty clustering, which does not reduce the number of data points in any way and can be used when no clustering is needed. Each clustering type has an associated class, all of which share a common interface.
+
+The clustering type used in \verb+DiffVector+ is determined by a factory method passed its constructor. \verb+DiffVector+ can therefore use the clustering without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings can be saved and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be used. The parameters of the clustering are then passed directly to the \verb+CreateVisualization()+ method.
+
+The clustering object converts the \verb+Arrow+ instances (data points) to \verb+Cluster+ instances which are able to merge with other clusters and compute the clustering error given another \verb+Cluster+ instance. They also contain all the information needed for the visualization to be created. Here are their most important fields:
+
+\begin{itemize}
+\item Neighbors - a set of \verb+Cluster+ instances adjacent to the cluster
+\item Level - marks the step of the clustering algorithm in which this cluster was created (low number also means low clustering error)
+\item Representative Arrow - an \verb+Arrow+ instance representing the metric value for this cluster
+\item Size - the geometrical area of the cluster
+\item Left Child \& Right Child - \verb+Cluster+ instances out of which this cluster was created
+\item Primary Data Points - a list of all the vertices of the original triangle mesh which belong to this cluster
+\end{itemize}
+
+\verb+Cluster+ instances can be sorted according to their level.
+
+In general, each clustering object is initialized by the \verb+DiffVector+ class with a list of \verb+Arrow+ instances from the previous step (\ref{sec:analysis_metric}). Then \verb+DiffVector+ passes clustering parameters and the required cluster count to the clustering object. The clustering object checks if it already has a clustering corresponding to the given parameters and if it does, it simply extracts the required number of clusters from the available dendrogram and returns them. This is how the extraction works when the dendrogram is a tree\footnote{In this case, merging candidates only have to be neighbors}:
+
+\begin{algorithm}[H]
+\caption{Cluster Extraction from a Tree}
+\begin{algorithmic}[1]
+
+\Require MaxHeap chosenClusters, requiredClusterCount
+\Statex
+\State chosenClusters.Clear();
+\State chosenClusters.Insert(dendrogram root);
+\State i = 0;
+\While{i < requiredClusterCount}
+	\State highestCluster = chosenClusters.ExtractMax();
+    \State chosenClusters.Insert(highestCluster.LeftChild);
+    \State chosenClusters.Insert(highestClusters.RightChild);
+    \State i++;
+\EndWhile
+\Statex
+\Return chosenClusters as list
+\end{algorithmic}
+\end{algorithm}
+
+Here is the extraction algorithms for forest dendrograms\footnote{In this case, merging candidates have to be neighbors and their vectors must point in the same direction}:
+
+\begin{algorithm}[H]
+\caption{Cluster Extraction from a Forest}
+\label{algo:extraction_forest}
+\begin{algorithmic}[1]
+
+\Require MaxHeap chosenClusters, requiredClusterCount
+\Statex
+\State chosenClusters.Clear();
+\State chosenClusters.Insert(all dendrogram roots);
+\State i = 0;
+\While{i < requiredClusterCount}
+	\State highestCluster = chosenClusters.ExtractMax();
+    \State chosenClusters.Insert(highestCluster.LeftChild);
+    \State chosenClusters.Insert(highestClusters.RightChild);
+    \State i++;
+\EndWhile
+\State list = chosenClusters.ExtractMaxNTimes(requiredClusterCount);
+\Statex
+\Return list
+\end{algorithmic}
+\end{algorithm}
+
+Line 9 of algorithm \ref{algo:extraction_forest} makes sure that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection.
+
+If the desired clustering is not available, the clustering object performs the clustering algorithm. Here is the outline of it (largely similar to the one in \citet{Telea99}):
 
 \begin{algorithm}[H]
 \caption{Clustering}
@@ -45,3 +169,28 @@ In-depth explanation of the solution. (Developer documentation.)
 \Return c as root of tree
 \end{algorithmic}
 \end{algorithm}
+
+\subsubsection{Output}
+
+A list of \verb+Cluster+ instances is returned, even in the case of empty clustering where the only operation is the conversion of \verb+Arrow+ instances into \verb+Cluster+ instances.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Data Point Visualization}
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Visualization Viewer}
+
+\begin{itemize}
+\item What was reused and what was modified
+\end{itemize}
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{User Interface}
+
+\begin{itemize}
+\item Infrastructure
+\item Storing \& loading of stuff
+\end{itemize}
