@@ -79,7 +79,7 @@ The clustering object converts the \verb+Arrow+ instances (data points) to \verb
 \item Representative Arrow - an \verb+Arrow+ instance representing the metric value for this cluster
 \item Size - the geometrical area of the cluster
 \item Left Child \& Right Child - \verb+Cluster+ instances out of which this cluster was created
-\item Primary Data Points - a list of all the vertices of the original triangle mesh which belong to this cluster
+\item Primary Data Points - a list of all the original unclustered data points which are tied directly to the underlying mesh and which belong to this cluster
 \end{itemize}
 
 \verb+Cluster+ instances can be sorted according to their level.
@@ -138,38 +138,42 @@ If the desired clustering is not available, the clustering object performs the c
 \caption{Clustering}
 \begin{algorithmic}[1]
 
-\Require ClusterSet c
+\Require dataPoints, initalClusters, MinHeap clusteringCandidates \Comment clusteringCandidates are ordered by clustering error
 \Statex
-\For{all cells cell\textsubscript{i} \textbf{in} dataset}
-	\State c = makeCluster(cell\textsubscript{i});
-    \State set level of c to 0;
-    \State add c to s;
+\For{each point\textsubscript{i} \textbf{in} dataPoints}
+	\State initialCluster = makeCluster(point\textsubscript{i});
+    \State set level of intialCluster to 0;
+    \State add initialCluster to initialClusters;
 \EndFor
 \Statex
-\For{all clusters c\textsubscript{i} in s}
-	\For{all clusters c\textsubscript{j} neighbours of c\textsubscript{i}}
-    	\State e = clusteringError(c\textsubscript{i}, c\textsubscript{j});
-        \State insert pair (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error e in a hash table;
-        \State mark c\textsubscript{i} and c\textsubscript{j} as NOT\_CLUSTERED;
+\For{each cluster\textsubscript{i} in initialClusters}
+	\For{each cluster\textsubscript{j} neighbour of cluster\textsubscript{i}}
+    	\State e = clusteringError(cluster\textsubscript{i}, cluster\textsubscript{j});
+        \State insert (cluster\textsubscript{i}, cluster\textsubscript{j}) into clusteringCandidates
+        \State mark cluster\textsubscript{i} and cluster\textsubscript{j} as NOT\_CLUSTERED;
     \EndFor
 \EndFor
 \Statex
-\State int i = 0;
-\For{all pairs (c\textsubscript{i}, c\textsubscript{j}) in increasing order of error in the hash table}
-	\If{both c\textsubscript{i} and c\textsubscript{j} are NOT\_CLUSTERED}
-    	\State c = mergeClusters(c\textsubscript{i}, c\textsubscript{j});
-        set level of c to l++;
-        mark c\textsubscript{i} and c\textsubscript{j} as CLUSTERED;
-        \For{all neighbors n\textsubscript{i} of c}
-        	\State e = clusteringError(c, n\textsubscript{i});
-            insert pair (c, n\textsubscript{i}) in order in hash table
+\State level = 0;
+\While{clusteringCandidates.Count > 0}
+	\State (cluster\textsubscript{i}, cluster\textsubscript{j}) = clusteringCandidates.ExtractMin();
+    \If{cluster\textsubscript{i} and cluster\textsubscript{j} are both NOT\_CLUSTERED}
+    	\State newCluster = mergeClusters(cluster\textsubscript{i}, cluster\textsubscript{j});
+        \State set level of newCluster to level++;
+		\State mark newCluster as NOT\_CLUSTERED;
+        \State mark cluster\textsubscript{i} and cluster\textsubscript{j} as CLUSTERED;
+        \For{each cluster neighbour of newCluster}
+        	\State e = clusteringError(cluster, newCluster);
+            \State insert (cluster, newCluster) into clusteringCandidates
         \EndFor
     \EndIf
-\EndFor
+\EndWhile
 \Statex
 \Return c as root of tree
 \end{algorithmic}
 \end{algorithm}
+
+It is worth mentioning that when a new cluster is created, it needs to be placed in the clustering space by assigning all neighboring clusters of its two children to be the neighbors of the new cluster as well, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters as well.
 
 \subsubsection{Output}
 
