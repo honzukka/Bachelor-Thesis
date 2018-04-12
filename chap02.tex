@@ -27,6 +27,7 @@ We will now present all steps of the visualization process in more detail.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Triangle Mesh Representation}
+\label{sec:mesh_representation}
 
 We are using the implementation of a boundary representation of a triangle mesh with a corner table which was presented in \citet{Corner03}. The implementation was created by Josef Pelikán. For brevity, we will refer to this representation as a {\it scene representation}\footnotemark.
 
@@ -220,15 +221,47 @@ Either a triangle mesh or a list of triplets representing colors is outputted ba
 %%-----------------------------------------------------------------------------------------
 \section{Mesh Diff}
 
-In order to demonstrate the visualizations, we have created a program called MeshDiff which enables the user to load two homologous triangle meshes and visualize their difference. We have also added a few features which allow for real-world use of the program such as visualization loading and storing and parameter loading and storing. This makes MeshDiff and our visualizations ready to use without the need of further programming work.
+In order to demonstrate the visualizations, we have created a program called MeshDiff which enables the user to load two homologous triangle meshes and visualize the difference between them. For this purpose, we have reused code written by Josef Pelikán which is able to view an arbitrary triangle mesh and has a few other features. We have modified this code to be able to view two meshes at the same time which makes the visualizations more powerful and clear. On top of that, we have extended the user interface to allow for visualization configuration. Lastly, we incorporated the visualization algorithm into the code.
 
-We will now talk about the architecture of MeshDiff and we will mention how the visualization algorithms are implemented in it.
+We will now discuss these implementation steps.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Mesh Viewing}
 
+Watch out that you don't introduce new functionality!
+
+Maybe change the order of points in this chapter. First talk about the necessary, then about the additions (parameters and stuff).
+
+The original code from Josef Pelikán has support for two standard triangle mesh formats, namely \verb+.obj+ and \verb+.ply+. It is able to load these formats and also convert between them by storing a loaded mesh in the target format. As has already been mentioned in section \ref{sec:mesh_representation}, internally, the meshes are represented using the corner table. This representation, implemented in the \verb+Scene+ class is able to store itself in a vertex buffer object when a pointer is provided. The rendering of the meshes is then handled by the OpenTK library written in C\# which provides an interface to OpenGL. The viewing angle and zoom can be controlled in real time using the \verb+Trackball+ class which intercepts mouse clicks and mouse movement from the WinForms user interface and computes a corresponding model matrix for the triangle mesh. The code is written in C\# and user interface is created in WinForms.
+
+\begin{itemize}
+\item describe the architecture of the code more in detail (but not too much)
+\item messy!
+\end{itemize}
+
+The code also provides the possibility for the user to toggle wireframe view, shading and also ambient, diffuse and specular lighting. (Mnetion all the toggles you will keep.)
+
+We have reused this code because it suits our purpose perfectly. We have, however, modified the core rendering module to be able to render two triangle meshes next to each other at once. We have also modified the user interface in such a way that it is possible to control the viewing angle and zoom of both meshes at the same time which makes finding the same area of interest in both meshes much easier. If not desirable, this functionality can be turned off.
+
+\begin{itemize}
+\item how has this been this achieved? be more technical! (but not too much)
+\end{itemize}
+
+We will now talk about the changes to the user interface.
 %%-----------------------------------------------------------------------------------------
 \subsection{UI Support for Difference Visualization}
 
+\begin{itemize}
+\item metric setting, parameters
+\item visualization choice and update
+\item parameter storing/loading
+\end{itemize}
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Infrastructure}
+
+\begin{itemize}
+\item mesh/vis rendering, loading and storing
+\item vis wireframe
+\item visualization job setup
+\item visualization job execution
+\end{itemize}
