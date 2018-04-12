@@ -8,7 +8,7 @@ In this chapter we will describe the implementation details of the MeshDiff prog
 \item Data point visualization
 \end{itemize}
 
-We will also mention technical details of the user interface, namely how the visualization process is configured, launched and how the resulting visualizations are presented to the user.
+We will also mention how the algorithm is incorporated into MeshDiff, how mesh viewing works and how the user interface is designed to support the features outlined in section \ref{sec:meshdiff_features}.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -219,37 +219,22 @@ Either a triangle mesh or a list of triplets representing colors is outputted ba
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
-\section{Mesh Diff}
+\section{MeshDiff Architecture}
 
-In order to demonstrate the visualizations, we have created a program called MeshDiff which enables the user to load two homologous triangle meshes and visualize the difference between them. For this purpose, we have reused code written by Josef Pelikán which is able to view an arbitrary triangle mesh and has a few other features. We have modified this code to be able to view two meshes at the same time which makes the visualizations more powerful and clear. On top of that, we have extended the user interface to allow for visualization configuration. Lastly, we incorporated the visualization algorithm into the code.
-
-We will now discuss these implementation steps.
+When introducing the design of MeshDiff, we will first discuss the original code by Josef Pelikán used for mesh viewing and how we modified it, then we will describe how the user interface has been changed to support features outlined in section \ref{sec:meshdiff_features} and then we will show how the visualization algorithm has been incorporated into the program.
 
 %%-----------------------------------------------------------------------------------------
-\subsection{Mesh Viewing}
+\subsection{Triangle Mesh Viewing}
 
-Watch out that you don't introduce new functionality!
+The original code of MeshDiff support the two most common standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files of these formats and also convert between them and the internal representation (see section \ref{sec:mesh_representation}) of a triangle mesh. This {\it scene} can then be rendered by calling its own method which fills the vertex buffer object with its data. In each frame, a special rendering method is called which comprises OpenTK calls tied to a WinForms control showing the triangle mesh. This process can be modified by a set of toggles which can change the viewing mode to wireframe or turn on shading.
 
-Maybe change the order of points in this chapter. First talk about the necessary, then about the additions (parameters and stuff).
+Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse clicks and moves from the user interface and modifies the model matrix used in the rendering process.
 
-The original code from Josef Pelikán has support for two standard triangle mesh formats, namely \verb+.obj+ and \verb+.ply+. It is able to load these formats and also convert between them by storing a loaded mesh in the target format. As has already been mentioned in section \ref{sec:mesh_representation}, internally, the meshes are represented using the corner table. This representation, implemented in the \verb+Scene+ class is able to store itself in a vertex buffer object when a pointer is provided. The rendering of the meshes is then handled by the OpenTK library written in C\# which provides an interface to OpenGL. The viewing angle and zoom can be controlled in real time using the \verb+Trackball+ class which intercepts mouse clicks and mouse movement from the WinForms user interface and computes a corresponding model matrix for the triangle mesh. The code is written in C\# and user interface is created in WinForms.
+We have generalized this process slightly for the purpose of showing two triangle meshes at the same time. We have doubled the number of buffer objects and added parameters to the rendering methods which allow us to choose which {\it scene} to render and where to render it. Each viewing panel has its own \verb+Trackball+ and when paired control is turned on (the viewing angle and zoom of both meshes is controlled simultaneously), all mouse events are sent to both of them. This ensures that the model matrix of both triangle meshes is the same.
 
-\begin{itemize}
-\item describe the architecture of the code more in detail (but not too much)
-\item messy!
-\end{itemize}
-
-The code also provides the possibility for the user to toggle wireframe view, shading and also ambient, diffuse and specular lighting. (Mnetion all the toggles you will keep.)
-
-We have reused this code because it suits our purpose perfectly. We have, however, modified the core rendering module to be able to render two triangle meshes next to each other at once. We have also modified the user interface in such a way that it is possible to control the viewing angle and zoom of both meshes at the same time which makes finding the same area of interest in both meshes much easier. If not desirable, this functionality can be turned off.
-
-\begin{itemize}
-\item how has this been this achieved? be more technical! (but not too much)
-\end{itemize}
-
-We will now talk about the changes to the user interface.
+As mentioned in section \ref{sec:meshdiff_features}, when 3D arrows are part of the visualization, they can be stored and loaded at the same time. Also, we wanted the wireframe view toggle to work separately for arrows a that can improve the clarity of a visualization in certain cases. Therefore, we store the triangle meshes and the arrows in separate {\it scenes}. We have added one more {\it scene} parameter to the rendering methods and one more set of buffer objects to be able to implement this.
 %%-----------------------------------------------------------------------------------------
-\subsection{UI Support for Difference Visualization}
+\subsection{User Interface}
 
 \begin{itemize}
 \item metric setting, parameters
