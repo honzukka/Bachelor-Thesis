@@ -182,6 +182,7 @@ A list of \verb+Cluster+ instances is returned, even in the case of empty cluste
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Data Point Visualization}
+\label{sec:implementation_visualizers}
 
 In section \ref{sec:analysis_visualizations}, we have proposed several types of visualizations. Each of them has an associated class in MeshDiff which generates it based on \verb+Cluster+ instances supplied to it. There are two interfaces which these visualizer classes can implement, depending on whether they produce arrow-based or color-based visualizations. Objects of these classes are passed to the \verb+CreateVisualization()+ method which stores the visualizations in the \verb+DiffVector+ object. Because arrow-based and color-based visualizations can be combined into one, \verb+CreateVisualization()+ accepts two visualizer parameters, one for each interface. At least one of them should be provided for the \verb+DiffVector+ class to generate a visualization.
 
@@ -236,17 +237,18 @@ As mentioned in section \ref{sec:meshdiff_features}, when 3D arrows are part of 
 %%-----------------------------------------------------------------------------------------
 \subsection{User Interface}
 
-\begin{itemize}
-\item metric setting, parameters
-\item visualization choice and update
-\item parameter storing/loading
-\end{itemize}
+We have extended the original user interface by adding functionality which allows the user to configure the visualization before it is generated. The user can also save this configuration to a file or load it from a file.
+
+There are four places in the code where this configuration is stored. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters (see section \ref{sec:parameter_effect}) have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
+
+Apart from being able to pass the parameters to the \verb+DiffVector+ class in a compact way, this approach also has the advantage that each class encapsulating a certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark.
+
+\footnotetext{Metric type is stored in a variable but there is a dedicated class called \verb+Metric+ in the program which handles metric computation and on top of that is also able to handle the input/output operations.}
+
+Each of the parameter classes implement individual parameters as properties and handle value checks. Exceptions thrown by these checks are not being caught, however, because the user interface is designed in such a way that invalid values cannot be assigned. Invalid assignments from code are then correctly detected and an exception is thrown in such cases.
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Infrastructure}
 
-\begin{itemize}
-\item mesh/vis rendering, loading and storing
-\item vis wireframe
-\item visualization job setup
-\item visualization job execution
-\end{itemize}
+Once the user has finished their configuration and starts the visualization generation, an asynchronous job is initialized to handle this process in a user-friendly way.
+
+The complete configuration including the visualizer classes (see section \ref{sec:implementation_visualizers}) and {\it scenes} for the triangle meshes potentially receiving new vertex colors and for potential 3D arrows become part of a job configuration package. Once a job is initialized with this package, its behavior is fully determined and its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffVector+ class, initializes it and calls its method according to the parameters passed to it. The thread is started together with a dialog window which shows progress and at the same time prevents the user from doing anything else with the program. Once the visualization process finishes, the program checks whether is has finished successfully or not and assigns the currently displayed {\it scenes} accordingly.
