@@ -1,34 +1,34 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-Introduce the problem, explain why it is interesting and outline the goal of the thesis.
+Visualization of the difference between two triangle meshes is often used in geometric morphometrics\footnotemark where biological objects such as bones, facial symmetries and other are studied. The objects are digitally represented by triangle meshes and the difference between them can be computed using various metrics such as distance, curvature difference and others. For demonstration and publication purposes it is extremely useful to visualize these metrics in a suitable way because this is much clearer than presenting the original triangle meshes or even the measured values alone.
+
+\footnotetext{The word ``morphometrics'' is of Greek origin and means ``the quantitative analysis of form''.}
+
+We will first examine how visualizations are handled in publicly available software, mention their disadvantages and then we will state how we aim to improve them.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
-\section*{Morphome3cs}
+\section*{Existing Mesh Difference Visualizations}
 
-TODO
-%%-----------------------------------------------------------------------------------------
-%% SECTION
-%%-----------------------------------------------------------------------------------------
-\section*{Applications of Mesh Difference Visualization}
+Our main reference program will be Morphome3cs\footnotemark, a piece of software developed by researchers at Charles University which allows users to process and analyze 3D data, mostly of anthropological origin.
 
-TODO
-%%-----------------------------------------------------------------------------------------
-%% SECTION
-%%-----------------------------------------------------------------------------------------
-\section*{Mesh Difference Visualization in Morphome3cs and Elsewhere}
+\footnotetext{\citet{Morpho}}
 
 Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshes from two arbitrary triangle meshes and use it to compute and visualize the difference between them. Currently, Morphome3cs is able to produce color-based visualizations of multiple difference metrics. These metrics are:
 
+\footnotetext{Two triangle meshes are homologous if they have the same number of vertices and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(w_i \in Mesh_2\).}
+
 \begin{itemize}
-\item Corresponding vertex distance (fig. \ref{fig:morpho_example})
+\item Corresponding vertex distance (Fig. \ref{fig:morpho_example})
 \item Corresponding vertex distance projected into the surface normal
 \item Angle between corresponding surface normals
 \item FESA\footnotemark
 \item Curvature difference
 \end{itemize}
+
+\footnotetext{Finite Element Surface Analysis - captures the difference between corresponding triangle areas}
 
 The disadvantage of these color-based visualizations is that they fail to capture multi-dimensional information. For example, when using vertex distance as a metric, it is impossible to encode both magnitude and direction into color at the same time while maintaining visual clarity.
 
@@ -55,21 +55,18 @@ The disadvantage of these color-based visualizations is that they fail to captur
 \caption{Visualizations in MeshLab and CloudCompare}
 \end{figure}
 
-Other approaches can be found for example in MeshLab (fig. \ref{fig:meshlab_example}) and CloudCompare (fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly by using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is able to visualize the difference between two arbitrary triangle meshes (or a triangle mesh and a point cloud) by simply finding the nearest triangle to a given point, computing the distance and encoding this metric into color \citep{CloudCmpDistance}. It can also produce a color-based visualization of the difference between two point clouds.
+Other approaches can be found for example in MeshLab \footnote{\citet{MeshLab}} (Fig. \ref{fig:meshlab_example}) and CloudCompare\footnote{\citet{CloudCmp}} (Fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is able to visualize the difference between two arbitrary triangle meshes (or a triangle mesh and a point cloud) by simply finding the nearest triangle to a given point, computing the distance and encoding this metric into color \citep{CloudCmpDistance}. It can also produce a color-based visualization of the difference between two point clouds.
 
-\addtocounter{footnote}{-3}
-\stepcounter{footnote}\footnotetext{Two triangle meshes are homologous if they have the same number of vertices and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(v_i \in Mesh_2\).}
-\stepcounter{footnote}\footnotetext{Finite Element Surface Analysis, captures the difference between corresponding triangle areas}
-\stepcounter{footnote}\footnotetext{One-sided Hausdorff Distance between two point sets \(S_1, S_2\) is defined as \(E(S_1, S_2) = \max_{p \in S_1} \min_{p' \in S_2} d(p, p')\) where \(d\) is the Euclidean distance between two points. Details of the computation used in MeshLab can be found in \citet{Metro98}.}
+\footnotetext{One-sided Hausdorff Distance between two point sets \(S_1, S_2\) is defined as \(E(S_1, S_2) = \max_{p \in S_1} (\min_{p' \in S_2} d(p, p'))\) where \(d\) is the Euclidean distance between two points. Details of the computation used in MeshLab can be found in \citet{Metro98}.}
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section*{Our Goal}
 
-In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create arrow-based visualizations which will be able to display multidimensional information. We will visualize difference metrics from Morphome3cs which are potentially multidimensional and can be represented by an arrow, namely {\it corresponding vertex distance} and {\it corresponding vertex distance projected into the surface normal}. Other metrics which can be represented by an arrow can be easily added. The input of our algorithm will be two homologous triangle meshes as in Morphome3cs. We will focus on the visual appearance of devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be carried out to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
+In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create arrow-based visualizations which will be able to display multidimensional information. We will visualize difference metrics from Morphome3cs which are potentially multidimensional and can be represented by an arrow, namely {\it corresponding vertex distance} and {\it corresponding vertex distance projected into the surface normal}. Other metrics which can be represented by an arrow can be easily added. The input of our algorithm will be two homologous triangle meshes as in Morphome3cs. We will focus on the visual appearance of devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be conducted to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section*{Thesis Structure}
 
-Chpater 1 of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter 2 delves into the implementation details of the visualizations in MeshDiff. Chapter 3 provides a user documentation of MeshDiff and Chapter 4 presents the results of the user study.
+Chapter 1 of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter 2 delves into the implementation details of the visualizations in MeshDiff. Chapter 3 provides a user documentation of MeshDiff and chapter 4 presents the results of the user study.
