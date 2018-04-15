@@ -1,29 +1,53 @@
 \chapter{Problem Analysis \& Solution}
 
-Our goal is to visualize difference metrics suitable for arrow visualization, out of which we will restrict ourselves to the following two:
+Our input are two homologous triangle meshes which are to be compared. One of the meshes will be used for displaying the visualization and we will call this mesh the {\it primary mesh}. We will call the other mesh the {\it reference mesh} because the difference metrics are computed on the {\it primary mesh} in relation to this mesh.
+
+Our goal is to visualize difference metrics from Morphome3cs which are potentially multi-dimensional and we have decided to restrict ourselves to the following two:
 
 \begin{itemize}
 \item Corresponding vertex distance
 \item Corresponding vertex distance projected into the surface normal
 \end{itemize}
 
-Other metrics can be easily added if needed. All metrics suitable for arrow visualization can be represented by a vector. Our input to the visualization part of the process will therefore be two homologous triangle meshes with vectors saved in each vertex. Drawing these vectors directly on the screen would be counter-productive as the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}). The solution is to devise a simple abstraction for this situation and use tools available for that abstraction.
+Other metrics can be easily added if needed. We have also decided to visualize these metrics using an arrow-based visualization which requires a suitable representation of our data. Because all metrics suitable for arrow-based visualizations can be represented by a vector, we will compute the metrics and place them as vectors in the corresponding vertices of the {\it primary mesh}.
+
+We will now shortly explain the meaning of the chosen metrics.
+
+\begin{itemize}
+\item For corresponding vertex distance, a vector is placed in the vertex of the {\it primary mesh} and if both meshes were overlaid, its apex would lie in the corresponding vertex of the {\it reference mesh}. This is therefore the most straightforward difference metric and it carries information in multiple dimensions, namely tangential difference and normal difference.
+\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When this number is multiplied with a unit surface normal it yields our vector placed in a vertex of the {\it primary mesh}. Despite the one-dimensionality of this metric, we will also use it for arrow-based visualizations to compare the results with existing visualizations.
+\end{itemize}
+
+We will split the vectors in two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:meshdiff-orientation}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which is a very common situation in geometric morphometrics.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{./img/meshdiff-unclustered_arrows-single.png}
-\caption{MeshDiff - Vertex distance visualized by unclustered arrows}
-\label{fig:meshdiff_unclustered}
+\includegraphics[width=0.6\textwidth]{./img/meshdiff-orientation.PNG}
+\caption[Arrow Orientation]{An example of arrows pointing ``outwards'' (yellow) and ``inwards'' (blue)}
+\label{fig:meshdiff-orientation}
 \end{figure}
+
+We are now working with a {\it primary mesh} containing vectors in all its vertices and we are looking for ways to visualize these vectors using an arrow-based visualization.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Seeing Mesh Difference as a Vector Field}
 
+If all vectors were drawn directly onto the {\it primary mesh}, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{./img/meshdiff-unclustered_arrows-single.png}
+\caption[MeshDiff - Vertex distance visualized by unclustered arrows]{MeshDiff - Vertex distance visualized by unclustered arrows}
+\label{fig:meshdiff_unclustered}
+\end{figure}
+
+One way to solve this problem is to devise a simple abstraction and use tools available for that abstraction.
+
 Vectors saved in the vertices of a triangle mesh form a discrete bounded vector field. Visualization of discrete vector fields is a very active research area with applications in engineering, molecular modelling and computational fluid dynamics. There exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
 
-Drawing inspiration from these papers we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information.
+Drawing inspiration from these papers we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information. We are now working with a discrete bounded vector field.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -35,7 +59,7 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:clustering_su
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.6\textwidth]{./img/clustering_subjectivity.png}
-\caption{The subjectivity of clustering - are there two or four clusters in the image?}
+\caption[The subjectivity of clustering]{The subjectivity of clustering - are there two or four clusters in the image?}
 \label{fig:clustering_subjectivity}
 \end{figure}
 
@@ -62,7 +86,7 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:clustering_su
     \includegraphics[width=\textwidth]{./img/telea-ellipse-vectors.PNG}
     \caption{The iso-error contours of multiple vectors}
 	\end{subfigure}
-\caption{The illustration of clustering in \citet{Telea99}}
+\caption[The illustration of clustering in \citet{Telea99}]{The illustration of clustering in \citet{Telea99}}
 \label{fig:telea-hierarchical_clustering}
 \end{figure}
 
@@ -91,7 +115,7 @@ where \(k_d + k_v + k_\alpha + k_m = 1\) are weight coefficients. The other comp
 \item \(m_{C_1C_2}\) is the sum of the mesh resolutions of the two clusters. \(m_{max}\) is the largest value of \(m\) in the whole data set.
 \end{itemize}
 
-The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D meshes. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
+The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the underlying mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D vector fields. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
 %%-----------------------------------------------------------------------------------------
 \subsection{Selection Criteria for Our Clustering Method}
 
@@ -117,16 +141,9 @@ We will now describe our clustering method.
 \subsubsection{Clustering Algorithm}
 \label{sec:analysis_clustering_algorithm}
 
-The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition to which clusters can be merged together. Since our vector fields are placed on the surface of a triangle mesh, a vector can either point ``inwards" or ``outwards" where the normal vector of the mesh surface is said to point ``outwards" (see Fig. \ref{fig:meshdiff-orientation}). Because this might be important to the user, our clustering candidates have to not only be neighbors (as in \citet{Telea99}) but also have the same orientation. We leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set.
+The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition as to which clusters can be merged together. Our clustering candidates will not only have to be neighbors (as in \citet{Telea99}) but their representative vectors will both have to point either {\it inwards} or {\it outwards} because this distinction may be of importance to the user. On the other hand, we leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{./img/meshdiff-orientation.PNG}
-\caption{An example of arrows pointing ``outwards'' (yellow) and ``inwards'' (blue)}
-\label{fig:meshdiff-orientation}
-\end{figure}
-
-We are not going to use the GPU-based approach to clustering computations from \citet{Peng12} because it does not allow the user to view the final visualization from varying angles in real time. This is important for finding the ideal viewing angle easily because in many cases such an angle is not known prior to the visualization process. We will store our vector field in memory and compute the clustering on the whole field in one process instead (as in \citet{Telea99}).
+We are not going to use the GPU-based approach to clustering computation from \citet{Peng12} because it does not allow the user to view the final visualization from varying angles in real time. This is important for finding the ideal viewing angle easily because in many cases such an angle is not known prior to the visualization process. We will store our vector field in memory and compute the clustering on the whole field in one process instead (as in \citet{Telea99}).
 
 \subsubsection{Clustering Error Function}
 
@@ -139,6 +156,8 @@ Besides clustering error computation, merging is the second crucial part of a hi
 \subsubsection{Summary}
 
 Our clustering method will use the hierarchical algorithm and vector field representation from \citet{Telea99} with the added optional condition of merging only clusters with the same representative vector orientation relative to the mesh surface. We will use the error function from \citet{Peng12} (see Eq. \ref{eq:clustering_error}). Merging of two clusters will be done by computing the area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
+
+We are now working with a set of clusters, each of which has a representative vector which encodes a metric averaged across the whole cluster.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
@@ -151,13 +170,13 @@ Here we present the descriptions of new visualizations. One of them is arrow-bas
 \subsection{Arrows}
 \label{sec:arrow_vis}
 
-Once a clustering of a vector field is obtained, representative vectors of all clusters which encode averaged difference metrics are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow which is copied to the scene at a specific position, angle and scale given by the representative vector and the cluster it belongs to.
+Once a clustering of a vector field is obtained, representative vectors of all clusters are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow which is copied to the scene at a specific position, angle and scale given by the representative vector and the cluster it belongs to.
 
 The length of the representative vector influences the length of the 3D arrow. Because the values of the metric can be very close to zero and because their value range is not generally very large, we have decided to set a certain minimum scale and maximum scale, which are adjustable by the user, and map the metric values (vector lengths) to the interval between them. In general, such an approach gives a more visually pleasing and clearer results, especially when the interval is chosen to be large enough.
 
 The scale of the 3D arrows also reflects the geometrical area of the clusters. The larger the clusters are, the thicker the arrows. Areas are again mapped to a user-defined interval for a clearer result. Large clusters are usually important because they represent a general trend in a given area and users should be able to see them more easily and also distinguish them from less important clusters.
 
-Lastly, and most importantly, the direction of the representative vector is reflected directly in the direction of the 3D arrow. With a distance metric, arrows pointing ``inwards'' represent a negative distance to the reference mesh and arrows pointing ``outwards'' represent a positive distance to the reference mesh. In a simplified way, one might say that negative distance signifies that the reference mesh is ``smaller'' in the given area and positive distance signifies that the reference mesh is ``larger'' in the given area.
+Lastly, and most importantly, the direction of the representative vector is reflected directly in the direction of the 3D arrow. In addition to that, Arrows pointing {\it inwards} can have a different color than arrows pointing {\it outwards} to make their differentiation easier for the user.
 
 We have therefore managed to encode three-dimensional information into our visualization.
 
@@ -186,7 +205,7 @@ We have therefore managed to encode three-dimensional information into our visua
     \caption{Smallest height \& width scale: \(0.5\); largest height \& width scale: 1; cluster count: 125}
     \label{fig:meshdiff_arrows_1-125}
 	\end{subfigure}
-\caption{MeshDiff - Arrow visualizations with various parameter settings}
+\caption[MeshDiff - Arrow visualizations with various parameter settings]{MeshDiff - Arrow visualizations with various parameter settings}
 \end{figure}
 
 \subsubsection{Expected Performance}
@@ -199,7 +218,7 @@ Next, we introduce two color visualizations of clusters: random and metric-based
 
 Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied to clusters.
 
-We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point ``inwards" and ``outwards". What differs is the shade assigned to clusters of specific metric value.
+We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point {\it inwards} and {\it outwards}. What differs is the shade assigned to clusters of specific metric value.
 
 In the relative mode, the highest and lowest metric values are evaluated first. The lowest value receives black color and the highest value receives the brightest user-defined color. All other values are mapped to this interval and receive a color which is a proportional mixture of the user-defined color and black.
 
@@ -219,7 +238,7 @@ In the absolute mode, black color is assigned to cluster of zero metric value an
     \label{fig:meshdiff_clustercolor_metric}
 	\end{subfigure}
     
-\caption{MeshDiff - Cluster color visualizations}
+\caption[MeshDiff - Cluster color visualizations]{MeshDiff - Cluster color visualizations}
 \end{figure}
 
 \subsubsection{Expected Performance}
@@ -246,7 +265,7 @@ For all types of metric-based visualizations including the original color-based 
     \label{fig:meshdiff_thresholding_arrows}
 	\end{subfigure}
     
-\caption{MeshDiff - Thresholded visualizations}
+\caption[MeshDiff - Thresholded visualizations]{MeshDiff - Thresholded visualizations}
 \end{figure}
 
 \subsubsection{Expected Performance}
@@ -260,7 +279,7 @@ The last visualization type presented in this thesis is the combination of color
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{./img/meshdiff-combination.PNG}
-\caption{MeshDiff - Combined visualization}
+\caption[MeshDiff - Combined visualization]{MeshDiff - Combined visualization}
 \label{fig:meshdiff_combination}
 \end{figure}
 
@@ -326,5 +345,5 @@ High resolution weight prefers clustering in sparse areas of the mesh and will t
 	\caption{High resolution weight}
 	\label{fig:meshdiff_high_resolution}
 	\end{subfigure}
-\caption{MeshDiff - Various clustering parameter settings}
+\caption[MeshDiff - Various clustering parameter settings]{MeshDiff - Various clustering parameter settings}
 \end{figure}
