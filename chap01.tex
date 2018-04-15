@@ -1,33 +1,26 @@
 \chapter{Problem Analysis \& Solution}
 
-Our input are two homologous triangle meshes which are to be compared. One of the meshes will be used for displaying the visualization and we will call this mesh the {\it primary mesh}. We will call the other mesh the {\it reference mesh} because the difference metrics are computed on the {\it primary mesh} in relation to this mesh.
+Our input are two homologous triangle meshes which are to be compared. One of the meshes will be used for displaying the visualization and we will call this mesh the {\it primary mesh}. We will call the other mesh the {\it reference mesh} because difference metrics are computed on the {\it primary mesh} in relation to this mesh.
 
-Our goal is to visualize difference metrics from Morphome3cs which are potentially multi-dimensional and we have decided to restrict ourselves to the following two:
+For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using only colors. In addition to that, we will also include corresponding vertex distance projected into the surface normal despite the fact that this metric only has one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
 
-\begin{itemize}
-\item Corresponding vertex distance
-\item Corresponding vertex distance projected into the surface normal
-\end{itemize}
-
-Other metrics can be easily added if needed. We have also decided to visualize these metrics using an arrow-based visualization which requires a suitable representation of our data. Because all metrics suitable for arrow-based visualizations can be represented by a vector, we will compute the metrics and place them as vectors in the corresponding vertices of the {\it primary mesh}.
-
-We will now shortly explain the meaning of the chosen metrics.
+After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it primary mesh}. For better understanding, here is the meaning of such a representation in case of both chosen metrics:
 
 \begin{itemize}
 \item For corresponding vertex distance, a vector is placed in the vertex of the {\it primary mesh} and if both meshes were overlaid, its apex would lie in the corresponding vertex of the {\it reference mesh}. This is therefore the most straightforward difference metric and it carries information in multiple dimensions, namely tangential difference and normal difference.
-\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When this number is multiplied with a unit surface normal it yields our vector placed in a vertex of the {\it primary mesh}. Despite the one-dimensionality of this metric, we will also use it for arrow-based visualizations to compare the results with existing visualizations.
+\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When this number is multiplied with a unit surface normal it yields our vector placed in a vertex of the {\it primary mesh}.
 \end{itemize}
 
-We will split the vectors in two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:meshdiff-orientation}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which is a very common situation in geometric morphometrics.
+We will split the vectors into two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:meshdiff-orientation}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.6\textwidth]{./img/meshdiff-orientation.PNG}
-\caption[Arrow Orientation]{An example of arrows pointing ``outwards'' (yellow) and ``inwards'' (blue)}
+\caption[Arrow Orientation]{An example of arrows pointing {\it outwards} (yellow) and {\it inwards} (blue)}
 \label{fig:meshdiff-orientation}
 \end{figure}
 
-We are now working with a {\it primary mesh} containing vectors in all its vertices and we are looking for ways to visualize these vectors using an arrow-based visualization.
+To summarize, we are now working with a {\it primary mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an arrow-based visualization.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
