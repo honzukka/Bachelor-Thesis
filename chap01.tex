@@ -1,4 +1,5 @@
 \chapter{Problem Analysis \& Solution}
+\label{sec:analysis}
 
 Our input are two homologous triangle meshes which are to be compared. One of the meshes will be used for displaying the visualization and we will call this mesh the {\it primary mesh}. We will call the other mesh the {\it reference mesh} because difference metrics are computed on the {\it primary mesh} in relation to this mesh.
 
@@ -211,7 +212,7 @@ Next, we introduce two color visualizations of clusters: random and metric-based
 
 Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied to clusters.
 
-We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point {\it inwards} and {\it outwards}. What differs is the shade assigned to clusters of specific metric value.
+We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point {\it inwards} and {\it outwards}. Also, the metric value here is the length of the associated vector. What differentiates the two modes is the shade assigned to clusters of specific metric value.
 
 In the relative mode, the highest and lowest metric values are evaluated first. The lowest value receives black color and the highest value receives the brightest user-defined color. All other values are mapped to this interval and receive a color which is a proportional mixture of the user-defined color and black.
 
