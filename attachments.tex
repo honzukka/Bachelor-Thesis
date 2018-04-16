@@ -1,3 +1,54 @@
 \chapter{Attachments}
 
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
 \section{Parameter Description}
+
+As mentioned in section \ref{sec:implementation_algorithm}, the proposed visualization algorithm can be configured by a set of clustering parameters and a set of visualization parameters. We will now provide an overview of all these parameters.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Clustering Parameters}
+
+\begin{description}
+\item [Cluster Count] Determines the number of clusters to be retrieved from the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) and used for visualization. If the dendrogram is a tree, any valid number of clusters is guaranteed to cover the whole data set. If the dendrogram is a forest (see section \ref{sec:analysis_clustering_algorithm}), certain parts of the data set may remain uncovered by the chosen clusters. {\bf Valid values:} \(\bm{[1,S]}\) where \(S\) is the size of the data set.
+\item [Direction Significance] Determines how large the direction weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
+\item [Magnitude Significance] Determines how large the magnitude weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
+\item [Position Significance] Determines how large the position weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
+\item [Resolution Significance] Determines how large the mesh resolution weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
+\end{description}
+
+\addtocounter{footnote}{-4}
+\stepcounter{footnote}\footnotetext{\label{conversion}Here is the conversion between {\it significance} and {\it weight}: Consider {\it significance} values \(s_d,s_m,s_p,s_r \in [1,100]\) and {\it weight} values \(k_d,k_m,k_p,k_r \in [0,1]\). We need \(k_d + k_m + k_p + k_r = 1\), therefore \(k_d = s_d / {(s_d + s_m + s_p + s_r)}\) and similarly for all other weights.}
+\stepcounter{footnote}\footnotetext{See footnote \ref{conversion}.}
+\stepcounter{footnote}\footnotetext{See footnote \ref{conversion}.}
+\stepcounter{footnote}\footnotetext{See footnote \ref{conversion}.}
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Visualization Parameters}
+
+\begin{description}
+\item [Arrow Height Minimum Scale] Determines the height of an arrow representing the lowest metric value present in the data set. This value will multiply the height of the default arrow (see section \ref{sec:implementation_visualizers}) and therefore does not represent the absolute value of the minimum arrow height. {\bf Valid values:} \(\bm{[0.1,10]}\)
+
+\item [Arrow Height Maximum Scale] Determines the height of an arrow representing the highest metric value present in the data set. This value will multiply the height of the default arrow (see section \ref{sec:implementation_visualizers}) and therefore does not represent the absolute value of the maximum arrow height. {\bf Valid values:} \(\bm{[0.1,10]}\)
+
+\item [Arrow Width Minimum Scale] Determines the width of an arrow representing a cluster with the smallest area out of all visualized clusters. This value will multiply the width of the default arrow (see section \ref{sec:implementation_visualizers}) and therefore does not represent the absolute value of the minimum arrow width. {\bf Valid values:} \(\bm{[0.1,10]}\)
+
+\item [Arrow Width Maximum Scale] Determines the width of an arrow representing a cluster covering the whole data set. This value will multiply the width of the default arrow (see section \ref{sec:implementation_visualizers}) and therefore does not represent the absolute value of the maximum arrow width. {\bf Valid values:} \(\bm{[0.1,10]}\)
+
+\item [Arrow Outwards Color] Determines the color of arrows pointing {\it outwards} (see section \ref{sec:analysis}). {\bf Valid values: Any RGB color}.
+
+\item [Arrow Inwards Color] Determines the color of arrows pointing {\it inwards} (see section \ref{sec:analysis}). {\bf Valid values: Any RGB color}.
+
+\item [Color Metric Outwards] Determines the hue of vertices which are assigned a metric vector pointing {\it outwards} (see sections \ref{sec:analysis} and \ref{sec:analysis-color}). {\bf Valid values: Any RGB color}.
+
+\item [Color Metric Inwards] Determines the hue of vertices which are assigned a metric vector pointing {\it inwards} (see sections \ref{sec:analysis} and \ref{sec:analysis-color}). {\bf Valid values: Any RGB color}.
+
+\item [Color Diff Threshold] In absolute mode (see section \ref{sec:analysis-color})), all vertices with an associated metric vector longer than this value will receive the brightest color. {\bf Valid values:} \(\bm{[1, \infty)}\) (In the MeshDiff UI this is limited by the diameter of the whole scene.)
+
+\item [Disabled Color] The color of vertices which were excluded from the visualization by thresholding. {\bf Valid values: Any RGB color}.
+
+\item [Disabled Threshold Length] All vertices with a shorter associated metric vector will be excluded from the visualization. {\bf Valid values:} \(\bm{[1, \infty)}\) (In the meshDiff UI this is limited by the diameter of the whole scene.)
+
+\item [Disabled Threshold Size] All vertices which are part of a cluster whose area is smaller than this value will be excluded from visualization. {\bf Valid values:} \(\bm{[1, \infty)}\) (In the meshDiff UI this is limited by the diameter of the whole scene squared.)
+\end{description}

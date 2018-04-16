@@ -6,6 +6,7 @@ In this chapter, we will delve into the implementation details of the presented 
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Visualization Algorithm}
+\label{sec:implementation_algorithm}
 
 All presented visualizations share a common workflow (or algorithm) in MeshDiff. In this section, we will discuss the following parts of the workflow:
 
@@ -27,7 +28,7 @@ The main public methods of \verb+DiffVector+ are \verb+CreateVisualization()+ an
 
 This approach ensures that all intermediate results which are difficult to compute like data point clustering and visualization data can be stored inside the \verb+DiffVector+ class and quickly retrieved later if necessary. When a new visualization is created on the same pair of meshes, all intermediate results which can be reused are reused and only the ones which change are computed.
 
-All visualization outputted from the \verb+BakeVisualization()+ class are in the form of triangle meshes which makes them easy to display, load and store using standard triangle mesh methods and formats. We will discuss this more in detail in section \ref{sec:implementation_visualizers} of this chapter.
+All visualization outputted from the \verb+BakeVisualization()+ class are in the form of triangle meshes which makes them easy to display, load and store using standard triangle mesh methods and formats. We will discuss this more in detail in section \ref{sec:implementation-visualizers-output} of this chapter.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Triangle Mesh Representation}
@@ -262,6 +263,7 @@ For each color visualization type mentioned in section \ref{sec:analysis_visuali
 Either a triangle mesh or a list of triplets representing colors is outputted based on the type of the visualization.
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Output}
+\label{sec:implementation-visualizers-output}
 
 Lastly, we will mention how generated visualizations can be obtained through the \verb+BakeVisualization()+ method of \verb+DiffVector+ after \verb+CreateVisualization()+ has been called.
 
