@@ -4,14 +4,15 @@
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Parameter Description}
+\label{sec:parameter_description}
 
-As mentioned in section \ref{sec:implementation_algorithm}, the proposed visualization algorithm can be configured by a set of clustering parameters and a set of visualization parameters. We will now provide an overview of all these parameters.
+As mentioned in section \ref{sec:implementation_algorithm}, the proposed visualizations can be configured by a set of clustering parameters, a set of visualization parameters and a few other parameters. We will now provide an overview of all of them.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Clustering Parameters}
 
 \begin{description}
-\item [Cluster Count] Determines the number of clusters to be retrieved from the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) and used for visualization. If the dendrogram is a tree, any valid number of clusters is guaranteed to cover the whole data set. If the dendrogram is a forest (see section \ref{sec:analysis_clustering_algorithm}), certain parts of the data set may remain uncovered by the chosen clusters. {\bf Valid values:} \(\bm{[1,S]}\) where \(S\) is the size of the data set.
+\item [Cluster Count] Determines the number of clusters to be retrieved from the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) and used for visualization. If the dendrogram is a tree, any valid number of clusters is guaranteed to cover the whole data set. If the dendrogram is a forest (see section \ref{sec:analysis_clustering_algorithm}), certain parts of the data set may remain uncovered by the chosen clusters. {\bf Valid values:} \(\bm{[1,S]}\) where \(S\) is the number of vertices of one of the {\it scenes}.
 \item [Direction Significance] Determines how large the direction weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
 \item [Magnitude Significance] Determines how large the magnitude weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
 \item [Position Significance] Determines how large the position weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
@@ -52,3 +53,86 @@ As mentioned in section \ref{sec:implementation_algorithm}, the proposed visuali
 
 \item [Disabled Threshold Size] All vertices which are part of a cluster whose area is smaller than this value will be excluded from visualization. {\bf Valid values:} \(\bm{[1, \infty)}\) (In the meshDiff UI this is limited by the diameter of the whole scene squared.)
 \end{description}
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Other Parameters}
+
+The rest of the parameters comprise the viewing angle and zoom of both {\it scenes} and also the metric type, clustering type and visualization type. They are used to configure the mesh viewer in MeshDiff and they also determine how the \verb+DiffVector+ class is initialized (see section \ref{sec:implementation-framework}).
+
+\begin{description}
+\item [Zoom Left \& Right] Determines the zoom factor of the mesh view. {\bf Valid values: Not limited.} (The default value is 1.)
+\item [Rotation Left \& Right] Determines the viewing angle of a mesh. {\bf Valid values: Any 4x4 rotation matrix.}
+\item [Metric] Determines the metric type used in difference computation. (See section \ref{sec:analysis}.) {\bf Valid values: \{Distance, NormalProjectedDistance\}}
+\item [Clustering Type] Determines the type of clustering used in the visualization process. (See section \ref{sec:implementation_clustering}.) {\bf Valid values: \{None, Simple, Signed\}}
+\item [Color Visualization] Determines the type of color visualization used. (See section \ref{sec:analysis-color}.) {\bf Valid values: \{None, VertexRelative, VertexAbsolute, ClusterRandom, ClusterRelative, ClusterAbsolute\}}
+\item [Arrow Visualization] Determines whether arrow visualization is used. {\bf Valid values: \{True, False\}}
+\end{description}
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Parameter Loading and Storing}
+\label{sec:parameter_load_store}
+
+In this section, we describe how MeshDiff can write its configuration to a file and also read it from a file. First, we will talk about the file format. It is a very simple custom format designed to store key/value pairs and to allow for easy reading and writing. Then we will mention how the process of reading and writing is realized in the code.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Format}
+
+Each file is divided into sections which are delimited by a special line containing the name of the section. What follows are key/value pairs, one pair per line. Here is an example of a full configuration file:
+
+\begin{code}
+---Trackball Left---
+zoom=1
+rotation=1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,1
+
+---Trackball Right---
+zoom=1
+rotation=1,0,0,0;0,1,0,0;0,0,1,0;0,0,0,1
+
+---Metric---
+metric=distance
+
+---Clustering Parameters---
+clusterCount=20
+directionSignificance=15
+positionSignificance=25
+magnitudeSignificance=10
+resolutionSignificance=0
+
+---Visualizer Parameters---
+arrowColorNear=0.5019608,0.5019608,0
+arrowColorFar=0.5019608,0.5019608,0
+colorNear=0.5019608,0,0.5019608
+colorFar=0.5019608,0,0.5019608
+disabledColor=1,0.5019608,0
+arrowWidthMinScale=10
+arrowWidthMaxScale=10
+arrowHeightMinScale=10
+arrowHeightMaxScale=10
+disabledThresholdLength=0.3
+disabledThresholdSize=0.8
+colorDiffThreshold=0.1
+
+---Form Settings---
+clusteringType=None
+colorVisualization=None
+arrowVisualization=False
+\end{code}
+
+All lines which do not fulfill any of the following requirements are ignored:
+
+\begin{itemize}
+\item Start with \verb+---+
+\item Yield exactly two strings upon split at \verb+=+
+\end{itemize}
+
+The format of keys and values is defined by the program.
+%%-----------------------------------------------------------------------------------------
+\subsection{Loading and Storing}
+
+We have written \verb+ParameterWriter+ and \verb+ParameterReader+ classes which can be used in a similar way other I/O classes are used in C\#.
+
+\verb+ParameterReader+ is initialized with a file path and a section name which is the full delimiting string shown above. Then a \verb+ReadPair()+ method can be called in a loop and key/value pairs are returned as tuples. When there are no more pairs in the given section, \verb+null+ is returned. All objects of this class should be disposed of at the end of their lifetime.
+
+\verb+ParameterWriter+ is also initialized with a file path and a section name and provides two methods: \verb+WritePair()+ and \verb+WriteEmptyLine()+. Both methods write to the given file and they always append to file. Upon the first call, a section of the given name is created and all subsequent calls write key/value pairs under that section. \verb+WritePair()+ can only accept arguments of type \verb+string+. This class also implements the \verb+IDisposable+ interface.

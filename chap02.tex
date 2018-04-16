@@ -21,6 +21,7 @@ First, however, we will describe the framework that the algorithm fits into and 
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Algorithm Framework}
+\label{sec:implementation-framework}
 
 The core class of MeshDiff which encapsulates the visualization algorithm is called \verb+DiffVector+. The name of the class suggests that it is able to work with difference metrics which can be represented by a 3D vector. \verb+DiffVector+ is initialized by the {\it primary mesh} and the {\it reference mesh} and therefore only operates on these two specific meshes throughout its whole lifetime.
 
@@ -113,6 +114,14 @@ A list of \verb+Arrow+ instances indexed by the handles of the corresponding ver
 \label{sec:implementation_clustering}
 
 As mentioned in \ref{sec:analysis_clustering_algorithm}, our clustering has multiple types. For the sake of consistency, we also introduce a third type, the empty clustering, which does not reduce the number of vectors in any way and can be used when no clustering is needed. Each clustering type has an associated class, all of which share a common interface.
+
+Overall, there are three clustering types in MeshDiff:
+
+\begin{itemize}
+\item None
+\item Simple (corresponds to clustering in \citet{Telea99})
+\item Signed (merges only vectors pointing in the same direction, either {\it inwards} or {\it outwards})
+\end{itemize}
 
 The clustering type used in \verb+DiffVector+ is determined by a factory method passed to its constructor. \verb+DiffVector+ can therefore use the clustering without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings of multiple types can be saved at the same time and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be generated thanks to the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}). The parameters of the clustering are passed directly to the \verb+CreateVisualization()+ method.
 
@@ -283,26 +292,41 @@ Because both the {\it primary scene} and the {\it reference scene} are assigned 
 %%-----------------------------------------------------------------------------------------
 \section{MeshDiff Architecture}
 
-When introducing the design of MeshDiff, we will first discuss the original code by Josef Pelikán used for mesh viewing and how we modified it, then we will describe how the user interface has been changed to support features outlined in section \ref{sec:meshdiff_features} and then we will show how the visualization algorithm has been incorporated into the program.
+Similarly to MeshLab or Morphome3cs, in MeshDiff, the core functionality is the ability to load and store triangle meshes and to view them interactively using the mouse cursor. Because this functionality is present in almost all programs which work with triangle meshes and at the same time it is non-trivial, we reused available code which provides it, more specifically we built MeshDiff on top of a mesh viewer application written by Josef Pelikán.
+
+%%-----------------------------------------------------------------------------------------
+\subsection{Platform}
+
+The reused code by Josef Pelikán is a C\# application with a WinForms user interface which uses the OpenTK library, which encapsulates the OpenGL API, to render graphics. This means that the only targeted operating system is Windows.
+
+In order to clearly mark which parts of MeshDiff are authored by us and which are reused, we have stated the origin of the code in each source file and in this thesis, we will use the terms {\it resued code} and {\it original code} to differentiate between the two.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Triangle Mesh Viewing}
 
-The original code of MeshDiff support the two most common standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files of these formats and also convert between them and the internal representation (see section \ref{sec:mesh_representation}) of a triangle mesh. This {\it scene} can then be rendered by calling its own method which fills the vertex buffer object with its data. In each frame, a special rendering method is called which comprises OpenTK calls tied to a WinForms control showing the triangle mesh. This process can be modified by a set of toggles which can change the viewing mode to wireframe or turn on shading.
+The {\it reused code} of MeshDiff supports two standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files in these formats and also convert between them and the internal {\it scene representation} (see section \ref{sec:mesh_representation}) of a triangle mesh. The {\it scene} can be prepared for rendering by storing its data in the vertex buffer object in the GPU. This can be accomplished by calling one of its own methods. In each frame, a rendering method is called which comprises OpenTK calls tied to a view panel showing the triangle mesh. The view panel is a custom OpenTK control placed directly in the main form of the application. This process can be configured by a set of toggles which can change the viewing mode to wireframe, enable shading, etc.
 
-Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse clicks and moves from the user interface and modifies the model matrix used in the rendering process.
+Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse events from the user interface and modifies the model matrix used in the rendering process.
 
-We have generalized this process slightly for the purpose of showing two triangle meshes at the same time. We have doubled the number of buffer objects and added parameters to the rendering methods which allow us to choose which {\it scene} to render and where to render it. Each viewing panel has its own \verb+Trackball+ and when paired control is turned on (the viewing angle and zoom of both meshes is controlled simultaneously), all mouse events are sent to both of them. This ensures that the model matrix of both triangle meshes is the same.
+We have added several modifications to this basic setup to support the rendering of visualizations of the difference between two triangle meshes. Here are the most significant ones:
 
-As mentioned in section \ref{sec:meshdiff_features}, when 3D arrows are part of the visualization, they can be stored and loaded at the same time. Also, we wanted the wireframe view toggle to work separately for arrows a that can improve the clarity of a visualization in certain cases. Therefore, we store the triangle meshes and the arrows in separate {\it scenes}. We have added one more {\it scene} parameter to the rendering methods and one more set of buffer objects to be able to implement this.
+\begin{itemize}
+\item We have added a second viewing panel for the inverted visualization on the {\it reference mesh}. This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
+\item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done be routing the mouse events from the view panels either to both \verb+Trackball+ instances or only the intended one.
+\item As mentioned in section \ref{sec:implementation-visualizers-output}, when 3D arrows are part of the visualization, they can be stored and loaded separately. For this case, we have added the option to toggle wireframe view independently for both displayed scenes. We therefore have separate fields for {\it scenes} containing arrows and more buffer objects to store them on the GPU.
+\item Lastly, the user is able to hide the computed visualizations and show the original triangle meshes instead. Visualization {\it scenes} and raw {\it scenes} are therefore stored separately for these actions to happen quickly. Also, rendering methods now are now more flexible to make the transition between rendering various {\it scenes} easier.
+\end{itemize}
+
 %%-----------------------------------------------------------------------------------------
 \subsection{User Interface}
 
-We have extended the original user interface by adding functionality which allows the user to configure the visualization before it is generated. The user can also save this configuration to a file or load it from a file.
+We have extended the original user interface by adding functionality which allows the user to configure the visualization before it is generated. For the complete description of the configuration options, see appendix \ref{sec:parameter_description}. The user can also save this configuration to a file or load it from a file.
 
-There are four places in the code where this configuration is stored. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters (see section \ref{sec:parameter_effect}) have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
+View configuration and the most important clustering and visualization parameters can be modified directly from the main form. Metric type and all other parameters have their separate dialog windows.
 
-Apart from being able to pass the parameters to the \verb+DiffVector+ class in a compact way, this approach also has the advantage that each class encapsulating a certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark.
+There are four places in the code where this configuration is held. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters (see section \ref{sec:parameter_effect}) have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
+
+Apart from being able to pass the parameters to the \verb+DiffVector+ class in a compact way, this approach also has the advantage that each class encapsulating a certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark. For further details on this functionality, see appendix \ref{sec:parameter_load_store}.
 
 \footnotetext{Metric type is stored in a variable but there is a dedicated class called \verb+Metric+ in the program which handles metric computation and on top of that is also able to handle the input/output operations.}
 
@@ -310,57 +334,6 @@ Each of the parameter classes implement individual parameters as properties and 
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Infrastructure}
 
-Once the user has finished their configuration and starts the visualization generation, an asynchronous job is initialized to handle this process in a user-friendly way.
+Once the user has finished their configuration and started the visualization generation, an asynchronous job is initialized to handle this process in a user-friendly way.
 
-The complete configuration including the visualizer classes (see section \ref{sec:implementation_visualizers}) and {\it scenes} for the triangle meshes potentially receiving new vertex colors and for potential 3D arrows become part of a job configuration package. Once a job is initialized with this package, its behavior is fully determined and its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffVector+ class, initializes it and calls its method according to the parameters passed to it. The thread is started together with a dialog window which shows progress and at the same time prevents the user from doing anything else with the program. Once the visualization process finishes, the program checks whether is has finished successfully or not and assigns the currently displayed {\it scenes} accordingly.
-
------------------------------------------
-
------------------------------------------
-%%-----------------------------------------------------------------------------------------
-%% SECTION
-%%-----------------------------------------------------------------------------------------
-\section{MeshDiff Application}
-
-In this section we will briefly talk about the main development decision behind the MeshDiff application.
-
-Our intention is to create an experimental application which will allow us to demonstrate the proposed visualizations, conduct a user study and also provide basic features for users who wish to experiment with visualizing their own data and potentially publish the visualizations without any extra implementation work.
-
-Just like in MeshLab or Morphome3cs, in MeshDiff, the core functionality is the ability to load and store triangle meshes and to view them interactively using the mouse cursor. Because this functionality is present in almost all programs which work with triangle meshes and at the same time it is non-trivial, we will reuse available code which provides it, more specifically we will build MeshDiff on top of a mesh viewer application written by Josef Pelikán.
-
-%%-----------------------------------------------------------------------------------------
-\subsection{Features}
-\label{sec:meshdiff_features}
-
-We will now briefly mention the features of Mesh Diff related to mesh difference visualization and the rationale behind them.
-
-\subsubsection{Two Viewing Panels}
-
-MeshDiff contains two viewing panels, therefore two triangle meshes can be loaded next to each other at the same time. This makes the difference visualizations much more powerful and clear because the user can see what the difference is related to.
-
-We have also added an option for the user to control the viewing angle and zoom of both meshes at the same time. Thanks to this feature, it is easier to find the same area of interest in both meshes and examine it further.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{./img/meshdiff.PNG}
-\caption[MeshDiff - Application view]{MeshDiff - Application view}
-\label{fig:meshdiff}
-\end{figure}
-
-\subsubsection{Visualization Configuration and Generation}
-
-The difference metric to be used, all clustering parameters (see section \ref{sec:parameter_effect}), visualization parameters (arrow size and color, thresholding, etc.) and the chosen visualization type form a configuration of the visualization process. This configuration can be fully customized in the user interface where the user can also generate a visualization and then toggle its visibility. Such a feature is vital for the full demonstration of the proposed methods.
-
-\subsubsection{Visualization Store and Load}
-
-Mesh Diff supports loading and storing of visualizations in the standard \verb+.ply+ format. This format was chosen because it is able to store color in vertices which makes it easier to work with than for example \verb+.obj+ where additional textures would have to be used for storing color. 
-
-In arrow visualizations (see section\ref{sec:arrow_vis}), the mesh and the arrows  can be stored in separate \verb+.ply+ files and also loaded from them which increases the variability of the application.
-
-\subsubsection{Configuration Store and Load}
-
-The complete configuration including the viewing angle and zoom value of both triangle meshes can also be saved to a file and subsequently loaded. Replication, demonstration and publication of specific visualizations is much easier with this feature.
-%%-----------------------------------------------------------------------------------------
-\subsection{Platform}
-
-Mesh Diff is written in C\#, its user interface is created in WinForms and rendering is handled by the OpenTK library which provides an interface to OpenGL in C\#. The reason for this choice is that we have available code written by Josef Pelikán which supports exactly those features that were mentioned at the beginning of this section and is easily extensible to support the extra features we have outlined above. Because MeshDiff is mainly of experimental nature and is mostly meant for the demonstration of visualization algorithms, the only targeted operating system is Windows.
+The complete configuration including the visualizer classes (see section \ref{sec:implementation_visualizers}) and {\it scenes} visualization baking (see section \ref{sec:implementation-visualizers-output}) become part of a job configuration package. Once a job is initialized with this package, its behavior is fully determined and its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffVector+ class, initializes it and calls its methods according to the configuration package. The thread is started together with a dialog window which shows progress and at the same time prevents the user from doing anything else with the program. Once the visualization process finishes, the program checks whether it has finished successfully or not and assigns based on that either renders the computed visualization {\it scenes} or reports an error and renders the raw {\it scenes}.
