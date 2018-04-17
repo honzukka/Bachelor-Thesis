@@ -10,6 +10,7 @@ As mentioned in section \ref{sec:implementation_algorithm}, the proposed visuali
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Clustering Parameters}
+\label{sec:clustering_parameters}
 
 \begin{description}
 \item [Cluster Count] Determines the number of clusters to be retrieved from the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) and used for visualization. If the dendrogram is a tree, any valid number of clusters is guaranteed to cover the whole data set. If the dendrogram is a forest (see section \ref{sec:analysis_clustering_algorithm}), certain parts of the data set may remain uncovered by the chosen clusters. {\bf Valid values:} \(\bm{[1,S]}\) where \(S\) is the number of vertices of one of the {\it scenes}.
@@ -27,6 +28,7 @@ As mentioned in section \ref{sec:implementation_algorithm}, the proposed visuali
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Parameters}
+\label{sec:visualization_parameters}
 
 \begin{description}
 \item [Arrow Height Minimum Scale] Determines the height of an arrow representing the lowest metric value present in the data set. This value will multiply the height of the default arrow (see section \ref{sec:implementation_visualizers}) and therefore does not represent the absolute value of the minimum arrow height. {\bf Valid values:} \(\bm{[0.1,10]}\)

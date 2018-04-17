@@ -140,13 +140,13 @@ We will now describe our clustering method.
 \subsubsection{Clustering Algorithm}
 \label{sec:analysis_clustering_algorithm}
 
-The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition as to which clusters can be merged together. Our clustering candidates will not only have to be neighbors (as in \citet{Telea99}) but their representative vectors will both have to point either {\it inwards} or {\it outwards} because this distinction may be of importance to the user. On the other hand, we leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set. See Fig. \ref{fig:forest_dendrogram} for an illustration.
+The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition as to which clusters can be merged together. Our clustering candidates will not only have to be neighbors (as in \citet{Telea99}) but their representative vectors will both have to point either {\it inwards} or {\it outwards} because this distinction may be of importance to the user. On the other hand, we leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set. See Fig. \ref{fig:forest_dendrogram} for an illustration. Clustering resulting in a forest dendrogram will be called {\it signed clustering} and clustering creating a tree dendrogram will be called {\it simple clustering}.
 
 \begin{figure}[h]
 \centering
 \def\svgwidth{\textwidth}
 \input{./illustrations/forest_dendrogram.pdf_tex}
-\caption[Forest Dendrogram]{An illustration of clustering with the optional condition enabled and the resulting dendrogram.}
+\caption[Forest Dendrogram]{An illustration of clustering with the optional condition enabled and the resulting dendrogram. It is impossible to cover the whole dataset with less than four clusters.}
 \label{fig:forest_dendrogram}
 \end{figure}
 
