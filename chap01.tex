@@ -1,34 +1,37 @@
 \chapter{Problem Analysis \& Solution}
 \label{sec:analysis}
 
-Our input are two homologous triangle meshes which are to be compared. One of the meshes will be used for displaying the visualization and we will call this mesh the {\it primary mesh}. We will call the other mesh the {\it reference mesh} because difference metrics are computed on the {\it primary mesh} in relation to this mesh.
+We will start by illustrating the input to our visualization problem.
 
-For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using only colors. In addition to that, we will also include corresponding vertex distance projected into the surface normal despite the fact that this metric only has one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
+Our input are two homologous triangle meshes which are to be compared. In order to clearly distinguish between these two meshes, we will call one of them the {\it primary mesh} and the other one will be the {\it reference mesh}. The mesh which carries the visualization is always the {\it primary mesh}. For example, Fig. \ref{fig:morpho_example} shows a {\it primary mesh}. The visualization demonstrates how different this {\it primary mesh} is from its {\it reference mesh}.
 
-After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it primary mesh}. For better understanding, here is the meaning of such a representation in case of both chosen metrics:
+For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using only colors. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric only has one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
+
+After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it primary mesh}. For a better understanding, here is the meaning of such a representation in case of both chosen metrics:
 
 \begin{itemize}
 \item For corresponding vertex distance, a vector is placed in the vertex of the {\it primary mesh} and if both meshes were overlaid, its apex would lie in the corresponding vertex of the {\it reference mesh}. This is therefore the most straightforward difference metric and it carries information in multiple dimensions, namely tangential difference and normal difference.
-\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When this number is multiplied with a unit surface normal it yields our vector placed in a vertex of the {\it primary mesh}.
+\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When a unit surface normal is multiplied by this number it yields our vector placed in a vertex of the {\it primary mesh}.
 \end{itemize}
 
-We will split the vectors into two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:meshdiff-orientation}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
+We will split the vectors into two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:input}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\textwidth]{./img/meshdiff-orientation.PNG}
-\caption[Arrow Orientation]{An example of arrows pointing {\it outwards} (yellow) and {\it inwards} (blue)}
-\label{fig:meshdiff-orientation}
+\def\svgwidth{\textwidth}
+\input{./illustrations/input_illustration.pdf_tex}
+\caption[Input Illustration]{A simplified schema of difference metric vectors. Yellow and blue arrows represent corresponding vertex distance, whereas red arrows show how the distance is projected into surface normal. Yellow arrows point {\it outwards} and blue arrows point {\it inwards}. Notice that all arrows are placed in the {\it primary mesh} and point towards the {\it reference mesh}.}
+\label{fig:input}
 \end{figure}
 
-To summarize, we are now working with a {\it primary mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an arrow-based visualization.
+To summarize, we are now working with a {\it primary mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an arrow-based visualization. See Fig. \ref{fig:input} for a schema of this situation.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Seeing Mesh Difference as a Vector Field}
 
-If all vectors were drawn directly onto the {\it primary mesh}, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}).
+If all vectors were drawn directly onto the {\it primary mesh}, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}). We also need a way to group similar vectors together to provide a more global difference visualization which existing color-based visualizations described in the introduction are incapable of.
 
 \begin{figure}[h]
 \centering
@@ -37,11 +40,13 @@ If all vectors were drawn directly onto the {\it primary mesh}, the visualizatio
 \label{fig:meshdiff_unclustered}
 \end{figure}
 
-One way to solve this problem is to devise a simple abstraction and use tools available for that abstraction.
+One way to solve this problem is to devise a simple abstraction and use tools available for this abstraction.
 
 Vectors saved in the vertices of a triangle mesh form a discrete bounded vector field. Visualization of discrete vector fields is a very active research area with applications in engineering, molecular modelling and computational fluid dynamics. There exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
 
-Drawing inspiration from these papers we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information. We are now working with a discrete bounded vector field.
+Drawing inspiration from these papers we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information.
+
+To summarize again, we are now visualizing a discrete bounded vector field.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -64,7 +69,7 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:clustering_su
 
 \addtocounter{footnote}{-2}
 \stepcounter{footnote}\footnotetext{Hierarchical clustering, also called bottom-up clustering, starts with each data point representing an elementary cluster. In each step of the algorithm, two clustering candidates are found from the available clusters according to certain criteria and subsequently merged. Hierarchical clustering creates a binary tree, also called a dendrogram, where each node represents a cluster and has two children from which it was created. Arbitrary number of clusters covering the whole data set can then be obtained by taking roots of disjoint subtrees which, when combined, contain all the leaves of the dendrogram. See Fig. \ref{fig:telea-hierarchical_clustering}.}
-\stepcounter{footnote}\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the "distance" between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same "distance" from \(v\). The shape of the ellipse and the location of its center can be controlled by parameters.}
+\stepcounter{footnote}\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the "distance" between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same "distance" from \(v\). The shape of the ellipse and the location of its center can be controlled by parameters. See Fig. \ref{fig:telea-hierarchical_clustering}.}
 
 \begin{figure}[h]
 \centering
@@ -125,7 +130,7 @@ Methods which are suitable for our specific vector field (i.e. a triangle mesh w
 
 Simple methods will allow us to quickly obtain a baseline which will help us to decide which modifications will improve the algorithm in our conditions. 
 
-Lastly, the ease of configuration will make our algorithm user-friendly and therefore it will increase the adoption rate.
+Lastly, the ease of user configuration will make our algorithm user-friendly and therefore it will increase the adoption rate.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Our Clustering Method}
@@ -135,9 +140,17 @@ We will now describe our clustering method.
 \subsubsection{Clustering Algorithm}
 \label{sec:analysis_clustering_algorithm}
 
-The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition as to which clusters can be merged together. Our clustering candidates will not only have to be neighbors (as in \citet{Telea99}) but their representative vectors will both have to point either {\it inwards} or {\it outwards} because this distinction may be of importance to the user. On the other hand, we leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set.
+The preference of hierarchical clustering over other mentioned clustering methods is justified by its simplicity and also the fact that a dendrogram is created during this clustering. This will allow us to quickly react to user requests for various cluster counts with given clustering parameters. Hierarchical clustering will thus make our approach user-friendly. We will, however, introduce one optional condition as to which clusters can be merged together. Our clustering candidates will not only have to be neighbors (as in \citet{Telea99}) but their representative vectors will both have to point either {\it inwards} or {\it outwards} because this distinction may be of importance to the user. On the other hand, we leave this condition as optional because the resulting dendrogram is not a tree but a forest instead. This may result in undesirable artifacts in the visualization because for certain cluster counts, the clustering will not cover the whole data set. See Fig. \ref{fig:forest_dendrogram} for an illustration.
 
-We are not going to use the GPU-based approach to clustering computation from \citet{Peng12} because it does not allow the user to view the final visualization from varying angles in real time. This is important for finding the ideal viewing angle easily because in many cases such an angle is not known prior to the visualization process. We will store our vector field in memory and compute the clustering on the whole field in one process instead (as in \citet{Telea99}).
+\begin{figure}[h]
+\centering
+\def\svgwidth{\textwidth}
+\input{./illustrations/forest_dendrogram.pdf_tex}
+\caption[Forest Dendrogram]{An illustration of clustering with the optional condition enabled and the resulting dendrogram.}
+\label{fig:forest_dendrogram}
+\end{figure}
+
+We are not going to use the GPU-based approach to clustering computation from \citet{Peng12} because it does not allow the user to view the final visualization from varying angles in real time. In order to support interactive visualization viewing, we will store our vector field in memory and compute the clustering on the whole field in one process instead (as in \citet{Telea99}).
 
 \subsubsection{Clustering Error Function}
 
@@ -149,9 +162,9 @@ Besides clustering error computation, merging is the second crucial part of a hi
 
 \subsubsection{Summary}
 
-Our clustering method will use the hierarchical algorithm and vector field representation from \citet{Telea99} with the added optional condition of merging only clusters with the same representative vector orientation relative to the mesh surface. We will use the error function from \citet{Peng12} (see Eq. \ref{eq:clustering_error}). Merging of two clusters will be done by computing the area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
+Our clustering method will use the hierarchical algorithm and CPU-based clustering computation from \citet{Telea99} with the added optional condition of merging only clusters whose representative vectors both point in the same direction - either {\it inwards} or {\it outwards}. We will use the error function from \citet{Peng12} (see Eq. \ref{eq:clustering_error}). Merging of two clusters will be done by computing the area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
 
-We are now working with a set of clusters, each of which has a representative vector which encodes a metric averaged across the whole cluster.
+After the clustering step, we are visualizing a set of clusters, each of which has a representative vector which encodes a difference metric averaged across the whole cluster.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
@@ -164,7 +177,14 @@ Here we present the descriptions of new visualizations. One of them is arrow-bas
 \subsection{Arrows}
 \label{sec:arrow_vis}
 
-Once a clustering of a vector field is obtained, representative vectors of all clusters are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow which is copied to the scene at a specific position, angle and scale given by the representative vector and the cluster it belongs to.
+Once a clustering of a vector field is obtained, representative vectors of all clusters are visualized using 3D arrows. For this purpose we have prepared a simple 3D model of an arrow (see Fig. \ref{fig:arrow_model}) which is copied to the scene at a specific position, angle and scale given by the representative vector and the cluster it belongs to.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.3\textwidth]{./img/8sided_arrow.PNG}
+\caption[Arrow Model]{Wireframe view of the 3D arrow model}
+\label{fig:arrow_model}
+\end{figure}
 
 The length of the representative vector influences the length of the 3D arrow. Because the values of the metric can be very close to zero and because their value range is not generally very large, we have decided to set a certain minimum scale and maximum scale, which are adjustable by the user, and map the metric values (vector lengths) to the interval between them. In general, such an approach gives a more visually pleasing and clearer results, especially when the interval is chosen to be large enough.
 
