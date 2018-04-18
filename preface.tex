@@ -4,7 +4,7 @@
 Visualization of the difference between two triangle meshes\footnotemark is often used in geometric morphometrics\footnotemark where the shapes of biological objects such as bones, facial symmetries and others are studied. In order to compare these objects, various difference metrics have been devised such as the distance between two overlaid meshes or the difference in curvature of corresponding parts of their surface. For demonstration and publication purposes it is extremely useful to visualize these difference metrics in such a way that they are easily understood. Presenting the differences on either raw triangle meshes or raw metric values is highly unsuggestive due to the large amount of data\footnotemark.
 
 \addtocounter{footnote}{-3}
-\stepcounter{footnote}\footnotetext{A triangle mesh is a collection of vertices, edges and triangles which is used for representing 3D objects in computer graphics.}
+\stepcounter{footnote}\footnotetext{\label{foot:triangle_mesh}A triangle mesh is a collection of vertices, edges and triangles which is used for representing 3D objects in computer graphics.}
 \stepcounter{footnote}\footnotetext{The word ``morphometrics'' is of Greek origin and means ``the quantitative analysis of form''.}
 \stepcounter{footnote}\footnotetext{Triangle meshes used in this thesis have over 15,000 vertices and it is not uncommon for triangle meshes of regular objects to have over 100,000 vertices.}
 
@@ -22,7 +22,7 @@ Our main reference program will be Morphome3cs\footnotemark, a piece of software
 
 Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshes from two arbitrary triangle meshes and use it to compute and visualize the difference between them. Currently, Morphome3cs is able to produce color-based visualizations of multiple difference metrics. These metrics are:
 
-\footnotetext{Two triangle meshes are homologous if they have the same number of vertices, edges and triangles and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(w_i \in Mesh_2\). Similarly for edges and triangles.}
+\footnotetext{\label{foot:homologous}Two triangle meshes are homologous if they have the same number of vertices, edges and triangles and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(w_i \in Mesh_2\). Similarly for edges and triangles.}
 
 \begin{itemize}
 \item Corresponding vertex distance (Fig. \ref{fig:morpho_example})

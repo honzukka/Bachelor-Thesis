@@ -1,7 +1,49 @@
 \chapter{MeshDiff User Documentation}
 
-About the experimental application. (User documentation.)
+This chapter is structured differently than the rest of the thesis because it aims to be a standalone introductory text to the purpose of MeshDiff and its structure from a user point of view. At the same time, we believe that it is useful to place this chapter before the presentation of the user study and its results because it introduces the context.
+
+For clarity, each section of this chapter represents an answer to a question the user may ask when consulting the user documentation. The text also addresses the user directly. At the beginning, however, we provide a short introduction of what MeshDiff is.
+
+\section{About MeshDiff}
+
+MeshDiff is a graphical program running on Windows operating systems which allows its users to interactively view two homologous triangle meshes\footnotemark in \verb+.ply+ or \verb+.obj+ format and visualize the difference between them. MeshDiff has various color-based, arrow-based and combined visualizations available. Once the user has found a visualization which suits their intentions the best, there are two options of saving the visualization:
 
 \begin{itemize}
-\item Talk about loading/saving parameters/visualizations
+\item It can be exported as a \verb+.ply+ file and subsequently loaded in any \verb+.ply+ viewer
+\item Its configuration can be saved. In this case, MeshDiff can load the configuration and generate the very same visualization under the very same viewing angle later
 \end{itemize}
+
+\footnotetext{See footnotes \ref{foot:triangle_mesh} and \ref{foot:homologous}.}
+
+\section{How do I begin?}
+
+Once you have two homologous triangle meshes you wish to compare (homologization can be done for example in Morphome3cs), load one of them into the left panel and the other one into the right panel:
+
+\begin{description}
+\item [To load the left mesh:] \verb+File > Load Model 1+, and choose the \verb+.obj+ or \verb+.ply+ file you wish to load
+\item [To load the right mesh:] \verb+File > Load Model 2+, and choose the \verb+.obj+ or \verb+.ply+ file you wish to load
+\end{description}
+
+\section{How do I control the view?}
+
+You can view the meshes interactively by clicking and dragging your mouse cursor over them. You can also zoom in and out using the mouse wheel.
+
+By default, when you hover over one of the meshes while controlling the view, you change the view of both meshes at the same time. This is because the \verb+Paired Controls+ toggle is enabled. To disable it, click \verb+View > Paired Controls+. Mesh views can be controlled separately now.
+
+There are more toggles in the \verb+View+ menu, all of which modify the view in a certain way. Here is their description:
+
+\begin{description}
+\item [Wire] Ahoj!
+\end{description}
+
+\section{What are difference metrics?}
+
+\section{How do I choose and generate a visualization?}
+
+\section{How do I configure arrow-based visualizations?}
+
+\section{How do I change the appearance of my visualization?}
+
+\section{How do I export my visualization?}
+
+\section{How do I save the configuration of my visualization?}
