@@ -13,8 +13,7 @@ All presented visualizations share a common workflow (algorithm) in MeshDiff. In
 \begin{itemize}
 \item Difference metric computation
 \item Vector clustering
-\item Vector visualization
-\item Visualization output
+\item Cluster visualization
 \end{itemize}
 
 First, however, we will describe the internal representation of triangle meshes in MeshDiff and the framework that the visualization algorithm fits into.
@@ -25,9 +24,15 @@ First, however, we will describe the internal representation of triangle meshes 
 
 We are using an implementation of triangle mesh boundary representation with a corner table which was presented in \citet{Corner03}. The implementation was written by Josef Pelikán. For brevity, we will refer to this representation as a {\it scene}.
 
-{\bf TODO:} insert an illustration of the representation and improve the description based on that
+\begin{figure}[h]
+\centering
+\def\svgwidth{0.5\textwidth}
+\input{./illustrations/corner_table.pdf_tex}
+\caption[Corner Table Illustration]{An illustartion of the corner table. The black corner has direct access to all red elements - its vertex and certain surrounding corners}
+\label{fig:corner_table}
+\end{figure}
 
-In this representation, we do not store the vertices of the triangle mesh but the corners of the triangles. The corner table then allows us to obtain the neighboring as well as opposite corners of a given corner and associated vertices in constant time. This makes traversing an arbitrary triangle mesh very simple and fast.
+In this representation, we do not primarily store the vertices of the triangle mesh but the corners of the triangles. The corner table then allows us to obtain certain surrounding corners of a given corner and associated vertices in constant time. This makes traversing an arbitrary triangle mesh very simple and fast.
 
 We have added several methods to this implementation in order for us to be able to quickly obtain the list of neighbors of a given vertex and compute the geometrical area of clusters.
 
@@ -37,43 +42,34 @@ We have added several methods to this implementation in order for us to be able 
 
 The core class of MeshDiff which encapsulates the visualization algorithm is called \verb+DiffVector+. The name of the class suggests that it works with difference metrics which can be represented by a 3D vector. \verb+DiffVector+ is initialized by the {\it primary scene} and the {\it reference scene} and therefore only operates on these two specific {\it scenes} throughout its whole lifetime.
 
-The main public methods of \verb+DiffVector+ are \verb+CreateVisualization()+ and \verb+BakeVisualization()+. \verb+CreateVisualization()+ is responsible for metric computation, data point clustering and the generation of a visualization. All the computed data is then stored inside the \verb+DiffVector+ class and the visualization has to be obtained via the \verb+BakeVisualization()+ method.
+The main public method of \verb+DiffVector+ is \verb+CreateVisualization()+. It is mainly responsible for metric computation and data point clustering. All this computed data is stored inside \verb+DiffVector+ instances. When the clustering is ready, a visualization is created and outputted from \verb+CreateVisualization()+ using a visualizer object.
 
-This approach ensures that all intermediate results which are difficult to compute like data point clustering and visualization data can be stored inside the \verb+DiffVector+ class and quickly retrieved later if necessary. When a new visualization is created on the same pair of {\it scenes}, all intermediate results which can be reused are reused and only the ones which should change are computed.
+The fact that all intermediate results are stored inside a \verb+DiffVector+ instance means that when \verb+CreateVisualization()+ is called again, data which is difficult to compute, especially the vector clustering, can be reused if possible.
 
-The pseudocode below describes the visualization workflow which will be further discussed, along with the way visualizations are retrieved, in the following sections.
+The C\#-styled\footnotemark pseudocode below describes the visualization workflow which will be further discussed in the following sections.
+
+\footnotetext{The \verb+ref+ keyword used with method arguments is meant to emphasize that a value is returned via these arguments.}
 
 \begin{algorithm}[H]
 \caption{CreateVisualization()}
 \label{algo:create_vis}
 \begin{algorithmic}[1]
 
-\Require metricType, visualizerCol, visualizerArr, clusteringParams, visParams \Comment other variables are contained in the DiffVector class
+\Require metricType, clusteringParams, visParams, visualizer, ref outputScene1, ref outputScene2 \Comment other variables are contained in the DiffVector object
 \Statex
-\If{required visualization exists}
-	\State return READY;
-\EndIf
 \Statex \Comment Difference metric computation
-\If{required metric value not available}
-	\State arrows = GetArrows(sceneP, sceneR, metricType);
+\If{required metric values not available}
+	\State arrows = GetArrows(primaryScene, refScene, metricType);
     \State clusteringObject = ClusteringFactory(arrows, sceneP);
     \State currentMetricType = metricType;
 \EndIf
 \Statex \Comment Vector clustering
 \State clusters = clusteringObject.GetClusters(clusteringParams);
-\State currentClusteringParams = clusteringParams;
-\Statex \Comment Vector visualization
-\If{color visualization requested}
-	\State colorVisP = visualizerCol.CreateVis(clusters, visParams);
-    \State colorVisR = visualizerCol.CreateVisInv(clusters, visParams);
-\EndIf
-\If{arrow visualization requested}
-	\State arrowVisP = visualizerArr.CreateVis(clusters, visParams);
-    \State arrowVisR = visualizerArr.CreateVisInv(clusters, visParams);
-\EndIf
-\State currentVisParams = visParams;
+\Statex \Comment Cluster visualization
+\State visualizer.BakeVis(clusters, visParams, ref outputScene1);
+\State visualizer.BakeVisInv(clusters, visParams, ref outputScene2);
 \Statex
-\State return READY;
+\Return
 \end{algorithmic}
 \end{algorithm}
 
@@ -81,23 +77,23 @@ The pseudocode below describes the visualization workflow which will be further 
 \subsection{Difference Metric Computation}
 \label{sec:analysis_metric}
 
-In order to compute a difference metric, this part of the workflow requires the type of the metric to compute and also both {\it scenes}. The former is passed in as an argument of \verb+CreateVisualization()+ and the latter is stored inside \verb+DiffVector+.
+In order to compute a difference metric, this part of the workflow requires the type of the metric it should compute and also both {\it scenes}. The former is passed in as an argument of \verb+CreateVisualization()+ and the latter are stored inside \verb+DiffVector+.
 
 As mentioned earlier, we have included two difference metrics in MeshDiff, both of which can be represented by a 3D vector:
 
 \begin{itemize}
 \item Corresponding vertex distance
-\item Corresponding vertex distance projected into the surface normal
+\item Corresponding vertex distance projected into surface normal
 \end{itemize}
 
-We have created a common representation for both of these metrics called \verb+Arrow+ which encapsulates a 3D vector, its origin and other useful data and acts as an input to the clustering algorithm.
+We have created a common representation for both of these metrics called \verb+Arrow+ which encapsulates a 3D vector, its origin and other useful data and acts as input to the clustering algorithm.
 
 Here are the most important fields of \verb+Arrow+:
 
 \begin{itemize}
-\item \verb+Origin+ - a 3D vector representing the position of the vector metric and initially coincides with a {\it scene} vertex (this can change during the clustering process)
+\item \verb+Origin+ - a 3D vector representing the position of the vector metric and initially coinciding with a {\it scene} vertex (this can change during the clustering process)
 \item \verb+Direction+ - a 3D vector representing the metric itself
-\item \verb+Orientation+ - tells whether the arrow points {\it inside} or {\it outside}
+\item \verb+Orientation+ - tells whether the arrow points {\it inwards} or {\it outwards}
 \item \verb+VertexHandle+ - if \verb+Origin+ coincides with a {\it scene} vertex, this is its index in the {\it scene} representation, otherwise it is -1
 \end{itemize}
 
@@ -111,7 +107,7 @@ A list of \verb+Arrow+ instances indexed by the handles of the corresponding ver
 \subsection{Vector Clustering}
 \label{sec:implementation_clustering}
 
-The clustering step requires the list of \verb+Arrow+ instances from the previous step and also the clustering parameters (see appendix \ref{sec:clustering_parameters}) and, most importantly, clustering type. The parameters are passed in as arguments of \verb+CreateVisualization()+. We will now talk about the clustering type.
+The clustering step requires the list of \verb+Arrow+ instances from the previous step, the clustering parameters (see appendix \ref{sec:clustering_parameters}) and, most importantly, the clustering type. The parameters are passed in as arguments of \verb+CreateVisualization()+. We will now talk about the clustering type.
 
 As mentioned in \ref{sec:analysis_clustering_algorithm}, our clustering has two types. For the sake of implementation consistency, we also introduce a third type, the ``empty'' clustering, which does not reduce the number of vectors in any way and can be used when no clustering is needed. Each clustering type has an associated class, all of which share a common interface.
 
@@ -123,9 +119,9 @@ Overall, there are three clustering types in MeshDiff:
 \item {\it Signed}
 \end{itemize}
 
-The clustering type used in \verb+DiffVector+ is determined by a factory method passed to its constructor. A \verb+DiffVector+ instance can therefore use the clustering without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings of multiple types can be saved simultaneously (in different \verb+DiffVector+ instances) and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be generated thanks to the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}).
+The clustering type used in \verb+DiffVector+ is determined by a factory method passed to its constructor. A \verb+DiffVector+ instance can therefore create and use the clustering object without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings of multiple types can be saved simultaneously (in different \verb+DiffVector+ instances) and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be generated, thanks to the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) which contains all clusterings of 1 to \(n\) clusters where \(n\) is the number of original arrows. When a reuse is impossible, a new clustering object is created using the factory method. Another reason why this encapsulation approach was chosen is that dendrograms should be stored in the clustering objects and not in the \verb+DiffVector+ instances in order for the implementation details to stay hidden from \verb+DiffVector+.
 
-We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process. \verb+Cluster+ instances are able to merge with other \verb+Cluster+ instances and compute the clustering error given another \verb+Cluster+ instance. They also contain all the information needed for the visualization to be created. Here are the most important fields of \verb+Cluster+:
+We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process and whose instances form nodes of the dendrogram. \verb+Cluster+ instances are able to merge with other \verb+Cluster+ instances and compute the clustering error given another \verb+Cluster+ instance. They also contain all the information needed for the visualization to be created. Here are the most important fields of \verb+Cluster+:
 
 \begin{itemize}
 \item \verb+Neighbors+ - a set of \verb+Cluster+ instances adjacent to the cluster
@@ -133,12 +129,12 @@ We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ insta
 \item \verb+RepresentativeArrow+ - an \verb+Arrow+ instance representing the metric value for this cluster
 \item \verb+Size+ - the geometrical area of the cluster
 \item \verb+LeftChild+ and \verb+RightChild+ - \verb+Cluster+ instances out of which this cluster was created
-\item \verb+PrimaryArrows+ - a list of all the original unclustered \verb+Arrow+ instances which are tied directly to the underlying mesh and which belong to this cluster
+\item \verb+PrimaryArrows+ - a list of all the original unclustered \verb+Arrow+ instances which are tied directly to the underlying {\it scene} and which belong to this cluster
 \end{itemize}
 
 \verb+Cluster+ instances can be sorted and the sorting field is \verb+Level+.
 
-If the new \verb+Arrow+ instances are the same as the current ones stored in \verb+DiffVector+, the old clustering object is reused. Otherwise, the factory method is used to initialize a new clustering object by the new \verb+Arrow+ instances. After that, clustering parameters and the required cluster count are passed to the clustering object. The clustering object checks if it already has a clustering corresponding to the given parameters and if it does, it simply extracts the required number of clusters from the available dendrogram and returns them. This is how the extraction works when the dendrogram is a tree\footnote{In this case, merging candidates only have to be neighbors}:
+If the new \verb+Arrow+ instances are the same as the current ones \verb+DiffVector+ contains, the old clustering object is reused. Otherwise, the factory method is used to initialize a new clustering object with the new \verb+Arrow+ instances. After that, clustering parameters including the required cluster count are passed to the clustering object. The clustering object checks if it already has a clustering corresponding to the given parameters and if it does, it simply extracts the required number of clusters from the available dendrogram and returns them. This is how the extraction works when the dendrogram is a tree\footnote{Corresponds to {\it simple clustering.}}:
 
 \begin{algorithm}[H]
 \caption{Cluster Extraction from a Tree}
@@ -160,7 +156,7 @@ If the new \verb+Arrow+ instances are the same as the current ones stored in \ve
 \end{algorithmic}
 \end{algorithm}
 
-Here is the extraction algorithms for forest dendrograms\footnote{In this case, merging candidates have to be neighbors and their vectors must all point either {\it inwards}, or {\it outwards}}:
+Here is the extraction algorithms for forest dendrograms\footnote{Corresponds to {\it signed clustering.}}:
 
 \begin{algorithm}[H]
 \caption{Cluster Extraction from a Forest}
@@ -184,18 +180,18 @@ Here is the extraction algorithms for forest dendrograms\footnote{In this case, 
 \end{algorithmic}
 \end{algorithm}
 
-Line 9 of algorithm \ref{algo:extraction_forest} makes sure that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection.
+Line 9 of algorithm \ref{algo:extraction_forest} ensures that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection. This is necessary to return the cluster count requested but at the same time it introduces the limitation we discussed in section \ref{sec:analysis_clustering_algorithm} which is that for certain cluster counts, the returned clusters do not cover the whole {\it scene}.
 
-If the desired clustering is not available, the clustering object performs the clustering algorithm. Here is the outline of it (largely similar to \citet{Telea99}):
+If the desired clustering is not available (i.e. the corresponding dendrogram is not built), the clustering object performs the clustering algorithm. Here is the outline of it (largely similar to \citet{Telea99}):
 
 \begin{algorithm}[H]
 \caption{Clustering}
 \begin{algorithmic}[1]
 
-\Require dataPoints, initalClusters, MinHeap clusteringCandidates \Comment clusteringCandidates are ordered by clustering error
+\Require arrows, MinHeap clusteringCandidates \Comment clusteringCandidates are ordered by clustering error
 \Statex
-\For{each point\textsubscript{i} \textbf{in} dataPoints}
-	\State initialCluster = makeCluster(point\textsubscript{i});
+\For{each arrow\textsubscript{i} \textbf{in} arrows}
+	\State initialCluster = makeCluster(arrow\textsubscript{i});
     \State set level of intialCluster to 0;
     \State add initialCluster to initialClusters;
 \EndFor
@@ -227,23 +223,34 @@ If the desired clustering is not available, the clustering object performs the c
 \end{algorithmic}
 \end{algorithm}
 
-It is worth mentioning that when a new cluster is created, it needs to be placed in the clustering space by assigning all neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. All other \verb+Cluster+ fields such as \verb+Size+, \verb+RepresentativeArrow+, including its orientation, and others are computed and assigned to the newly formed cluster as well.
+\verb+mergeClusters()+ and \verb+clusteringError+ are implemented exactly in accordance with section \ref{sec:analysis_clustering_algorithm}.
+
+It is worth mentioning that when a new cluster is created, it needs to be placed in the clustering space by modifying all neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. All other \verb+Cluster+ fields such as \verb+Size+, \verb+RepresentativeArrow+ including its orientation and others are computed and assigned to the newly formed cluster as well.
 
 \subsubsection{Output}
 
 A list of \verb+Cluster+ instances is returned, even in the case of ``empty'' clustering where the only operation is the conversion of \verb+Arrow+ instances into \verb+Cluster+ instances.
 
 %%-----------------------------------------------------------------------------------------
-\subsection{Vector Visualization}
+\subsection{Cluster Visualization}
 \label{sec:implementation_visualizers}
 
-When the visualization itself is to be generated from the list of \verb+Cluster+ instances, visualization parameters (see appendix \ref{sec:visualization_parameters}) and visualizer objects are required. The parameters are passed in as an argument of \verb+CreateVisualization()+. We will now talk about visualizer objects.
+When the visualization itself is to be generated from the list of \verb+Cluster+ instances, visualization parameters (see appendix \ref{sec:visualization_parameters}), a visualizer object and two output {\it scenes} are required. \verb+CreateVisualization()+ receives all of these as arguments. We will now talk about visualizer objects.
 
-In section \ref{sec:analysis_visualizations}, we have proposed several types of visualizations. Each of them has an associated visualizer object which generates it based on \verb+Cluster+ instances supplied to it. There are two interfaces which the visualizer classes can implement, depending on whether they produce arrow-based or color-based visualizations. Because arrow and color visualizations can be combined into one, \verb+CreateVisualization()+ accepts two visualizer arguments, one for each interface\footnotemark. At least one of them should be provided for the \verb+DiffVector+ class to generate a visualization.
+In section \ref{sec:analysis_visualizations}, we have proposed several types of visualizations. Each of them has an associated visualizer object which generates it based on \verb+Cluster+ instances supplied to it. It is useful to compare these objects with clustering objects described in section \ref{sec:implementation_clustering} because they are utilized differently in \verb+DiffVector+.
 
-\footnotetext{\label{foot:visualizers_vs_clustering_objects}The reason why visualizer objects and clustering objects are not handled in the same way in \verb+DiffVector+ is the following: There are only three types of clustering objects in the current version of MeshDiff and clustering is the most time-consuming part of the visualization process. Therefore we decided to increase speed rather than save memory. In the case of visualizations, there are many more types of visualizer objects and visualization generation does not take as long as clustering, therefore we preferred saving memory over increasing speed in this case.}
+Clustering objects are designed to store dendrograms for potential later reuse because their computation is time-consuming and a reuse is likely. Visualizer objects, on the other hand, do not store any state or intermediate results because visualizations are fast to compute and reuses are not very helpful because outputting a visualization requires similar time as creating it. They can therefore be passed to \verb+CreateVisualization()+ from the outside and used only to directly output visualizations.
 
-We will now focus on the visualizers of the two interfaces separately.
+All visualizer objects have two public methods, one is intended for visualizations for the {\it primary scene} and the other is intended for visualizations for the {\it reference scene}. The latter is obtained by inverting the former. See Fig. \ref{fig:input} for an illustration of the situation. Creating visualizations for both of the compared scenes allows for both of them to be displayed next to each other which enhances the effect of the visualizations. See Fig.\ref{fig:meshdiff-inverted_vis}.
+
+\begin{figure}[h]
+\centering
+	\includegraphics[width=\textwidth]{./img/mesh_diff-inverted_vis.png}
+    \caption[MeshDiff - Two mutually inverted visualizations]{MeshDiff - Two mutually inverted visualizations displayed next to each other}
+    \label{fig:meshdiff-inverted_vis}
+\end{figure}
+
+We will now focus on two main types of visualizers - arrow visualizers and color visualizers - and the way they bake the visualization into the output {\it scenes} mentioned in algorithm \ref{algo:create_vis}.
 
 \subsubsection{Arrow Visualizers}
 
@@ -265,36 +272,21 @@ Arrow visualizer objects only have one field which is initialized in the constru
 \caption[Wireframe models used for arrow visualizations]{Wireframe models used for arrow visualizations}
 \end{figure}
 
-The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{sec:analysis_visualizations} and on visualization parameters supplied. A {\it scene} containing all the created copies is then outputted.
+The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{sec:analysis_visualizations} and on visualization parameters supplied. Colors are assigned to the arrow {\it scenes} depending on whether the representative vector points {\it inwards} or {\it outwards} (see appendix \ref{sec:visualization_parameters}). All created arrow {\it scenes} are then copied into the output {\it scene} supplied.
+
+The inverted visualization is obtained by multiplying the representative vector by -1 and reassigning the arrow {\it scene} colors according to this version of the vector.
 
 \subsubsection{Color Visualizers}
 
-For each color visualization type mentioned in section \ref{sec:analysis_visualizations} (i.e. random, cluster relative, cluster absolute, etc.), there is a separate visualizer class implementing the color visualizer interface. This determines how color is assigned to vertices. In general, each visualizer loops though all \verb+Cluster+ instances supplied and for each of them it generates a color based on the metric value for that cluster. Clusters which were excluded in thresholding receive a special predefined color. Once a color is created, it is inserted into a list at precisely those indices which belong to the \verb+PrimaryArrows+ (see section \ref{sec:implementation_clustering}) of the associated cluster in the underlying {\it scene}. It is important to respect this indexing in order to make the mapping of the colors to the mesh vertices easier in the \verb+BakeVisualization()+ method of the \verb+DiffVector+ class. This list is then outputted.
+For each color visualization type mentioned in section \ref{sec:analysis_visualizations} there is a separate visualizer class. These classes determine how color is assigned to vertices. In general, each visualizer loops though all \verb+Cluster+ instances supplied and for each of them it generates a color based on the metric value for that cluster. Clusters which passed through thresholding receive a color based on the length of the representative vector and its orientation (see appendix \ref{sec:visualization_parameters}). Once a color is created, it is inserted into a list at precisely those indices which belong to the \verb+PrimaryArrows+ (see section \ref{sec:implementation_clustering}) of the associated cluster. It is important to respect this indexing in order to make the mapping of the colors to the {\it scene} vertices easier. The colors are then applied to the vertices of the output {\it scene} supplied\footnotemark.
 
-It is worth mentioning that we have also implemented color visualizers which ignore the representative vectors of clusters and use the \verb+PrimaryArrows+ field of a \verb+Cluster+ instance to create vertex color visualizations similar to the ones presented in the introduction. Even though a similar effect can be achieved when the ``empty'' clustering is used, this approach works regardless of the clustering type selected. This means that a combined visualization can be created where arrows are clustered but colors are not\footnotemark.
+The inverted visualization is also obtained by multiplying the representative vector by -1 and reassigning the arrow {\it scene} colors according to this version of the vector.
 
-\footnotetext{As mentioned at the beginning of section \ref{sec:implementation_clustering}, one \verb+DiffVector+ instance which controls the whole visualization process can only use a single type of clustering. We have made this decision as a countermeasure to the situation described in footnote \ref{foot:visualizers_vs_clustering_objects}. It saves memory because if more types were allowed, more dendrograms would have to be stored in one \verb+DiffVector+ instance. Also, we have not found it very useful to combine clustering types in any other way than the one presented here.}
+\footnotetext{It is worth mentioning that when the clusters supplied to this visualizer correspond to the original vectors (i.e. no clustering was performed), a per-vertex visualization is generated similar to those in MeshLab or Morphome3cs (see the introduction).}
 
 \subsubsection{Output}
 
-Either a {\it scene} containing arrows or a list of triplets representing colors is outputted based on the type of the visualization.
-%%-----------------------------------------------------------------------------------------
-\subsection{Visualization Output}
-\label{sec:implementation-visualizers-output}
-
-Lastly, we will mention how generated visualizations can be obtained through the \verb+BakeVisualization()+ method of \verb+DiffVector+ after \verb+CreateVisualization()+ has been called.
-
-When two {\it scenes} in a specific order are provided to \verb+BakeVisualization()+, several actions might be performed based on which visualizations are available in \verb+DiffVector+:
-
-\begin{itemize}
-\item If a color visualization is available, the scenes are assumed to be the {\it primary scene} and the {\it reference scene} that the visualization was computed for, respectively, and all vertices of the scenes are assigned the corresponding color. For the {\it primary scene}, colors are assigned as they are in the visualization. For the {\it reference scene}, all colors are inverted because from the perspective of the {\it reference scene} the original metric vectors point in the opposite direction.
-\item If an arrow visualization is available, the whole {\it scene} of arrows (see section \ref{sec:implementation_visualizers} for more details) is copied into the supplied {\it scenes}, where the assumed {\it reference scene} receives inverted arrows.
-\item If both are available, the color visualization is baked first because the number of colors and {\it scene} vertices would not match after the arrow visualization was baked.
-\end{itemize}
-
-It is noteworthy that in the second case, there are no assumptions on the supplied {\it scene}, therefore it can be empty, in which case arrows are stored separately from the underlying {\it scene} for greater flexibility, or it can be either the {\it primary} or the {\it reference} scene, in which case everything is stored in one data structure.
-
-Because both the {\it primary scene} and the {\it reference scene} are assigned a visualization, they can be displayed next to each other in order to emphasize the effect of the visualization. We will talk about this and the overall architecture of MeshDiff in the next chapter.
+The generated visualization is baked into the first supplied output {\it scene} and an inverted visualization is baked into the second supplied {\it scene}.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
@@ -302,37 +294,52 @@ Because both the {\it primary scene} and the {\it reference scene} are assigned 
 
 Similarly to MeshLab or Morphome3cs, in MeshDiff, the core functionality is the ability to load and store triangle meshes and to view them interactively using the mouse cursor. Because this functionality is present in almost all programs which work with triangle meshes and at the same time it is non-trivial, we reused available code which provides it, more specifically we built MeshDiff on top of a mesh viewer application written by Josef Pelikán.
 
+In this chapter, we will mention the platform MeshDiff is built on and intended for, then we will talk about the features we added to the reused mesh viewer and the changes we made to the user interface to support of visualization rendering purposes. At the end, we will reveal how the visualization workflow is incorporated into MeshDiff.
+
 %%-----------------------------------------------------------------------------------------
 \subsection{Platform}
 
-The reused code by Josef Pelikán is a C\# application with a WinForms user interface which uses the OpenTK library, encapsulating the OpenGL API, to render graphics. This means that the only targeted operating system is Windows.
+The reused code by Josef Pelikán is a C\# application with a WinForms user interface which uses the OpenTK library, encapsulating the OpenGL API, to render graphics. The only targeted operating system is Windows which is sufficient for our experimental purposes.
 
 In order to clearly mark which parts of MeshDiff are authored by us and which are reused, we have stated the origin of the code in each source file and in this thesis, we will use the terms {\it resued code} and {\it original code} to differentiate between the two.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Triangle Mesh Viewing}
 
-The {\it reused code} of MeshDiff supports two standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files in these formats and also convert between them and the internal {\it scene representation} (see section \ref{sec:mesh_representation}) of a triangle mesh. The {\it scene} can be prepared for rendering by storing its data in the vertex buffer object in the GPU. This is accomplished by calling one of its own methods. In each frame, a rendering method is called which comprises OpenTK calls tied to a view panel showing the triangle mesh. The view panel is a custom OpenTK control placed directly in the main form of the application. This process can be configured by a set of toggles which can change the viewing mode to wireframe, enable shading, etc.
+The {\it reused code} of MeshDiff supports two standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files in these formats and also convert between them and the internal {\it scene representation} (see section \ref{sec:mesh_representation}) of a triangle mesh. The {\it scene} can be prepared for rendering by storing its data in the vertex buffer object in the GPU. This is accomplished by calling one of the {\it scene's} own methods. In each frame, a rendering method is called which comprises OpenTK calls tied to a view panel showing the triangle mesh. The view panel is a custom OpenTK control placed directly in the main form of the application. This process can be configured by a set of toggles which can change the viewing mode to wireframe, enable shading, etc.
 
-Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse events from the user interface and modifies the model matrix used in the rendering process.
+Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse events from the view panel and modifies the model matrix used in the rendering process.
 
 We have added several modifications to this basic setup to support the rendering of visualizations of the difference between two triangle meshes. Here are the most significant ones:
 
 \begin{itemize}
-\item We have added a second viewing panel for the inverted visualization on the {\it reference mesh}. This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
-\item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done be routing the mouse events from the view panels either to both \verb+Trackball+ instances or only the intended one.
-\item As mentioned in section \ref{sec:implementation-visualizers-output}, when 3D arrows are part of the visualization, they can be stored and loaded separately. For this case, we have added the option to toggle wireframe view independently for both displayed scenes. We therefore have separate fields for {\it scenes} containing arrows and more buffer objects to store them on the GPU.
-\item Lastly, the user is able to hide the computed visualizations and show the original triangle meshes instead. Visualization {\it scenes} and raw {\it scenes} are therefore stored separately for these actions to happen quickly. Also, rendering methods now are now more flexible to make the transition between rendering various {\it scenes} easier.
+\item We have added a second viewing panel for the inverted visualization on the {\it reference mesh} (see section \ref{sec:implementation_visualizers}). This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
+\item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done be routing the mouse events from the view panels either to both \verb+Trackball+ instances or only to the intended one.
+\item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once had to be added to the rendering methods. In the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{sec:implementation_visualizers}).
+\item Lastly, the user is able to switch between viewing the computed visualizations and the raw triangle meshes. Visualization {\it scenes} (original with colors and a separate one with arrows) and raw {\it scenes} (only original ones) are therefore stored separately for these actions to happen quickly. Also, rendering methods now are now more flexible to make the transition between rendering various {\it scenes} easier.
 \end{itemize}
+
+For an illustration of the last two points, see Fig. \ref{fig:scenes_explained}.
+
+\begin{figure}[h]
+\centering
+\def\svgwidth{\textwidth}
+\input{./illustrations/scenes_explained.pdf_tex}
+\caption[Scenes Explained]{An illustration of the two view panels of MeshDiff and various scenes which can be displayed in them.}
+\label{fig:scenes_explained}
+\end{figure}
 
 %%-----------------------------------------------------------------------------------------
 \subsection{User Interface}
+\label{implemetation-user_interface}
 
 We have extended the {\it reused} user interface by adding functionality which allows the user to configure the visualization before it is generated. For the complete description of the configuration options, see appendix \ref{sec:parameter_description}. The user can also save this configuration to a file or load it from a file. See appendix \ref{sec:parameter_load_store} for more details on this.
 
+We have decided to duplicate clustering parameters and have a separate set for clustering in color visualizations and arrow visualizations. This makes MeshDiff more flexible because if there was only one set, it would not be possible to visualize using unclustered color and clustered arrows at the same time.
+
 The most important clustering and visualization parameters can be modified directly from the main form where both triangle meshes can be viewed interactively as well. Metric type and all other parameters have their separate dialog windows.
 
-There are four places in the code where this configuration is held. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters (see appendix \ref{sec:clustering_parameters}) have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
+There are four places in the code where this configuration is held. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
 
 Apart from being able to pass the parameters to the \verb+DiffVector+ class in a compact way, this approach also has the advantage that each class encapsulating a certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark.
 
@@ -347,8 +354,11 @@ The visualization is purely handled by our {\it original code}. Once the user ha
 The behavior of the job is fully determined by a configuration package class called \verb+JobParameters+. Here is the full list of its fields:
 
 \begin{itemize}
+\item \verb+DiffForColors+ - A \verb+DiffVector+ instance which handles clustering for color visualization
+\item \verb+DiffForArrows+ - A \verb+DiffVector+ instance which handles clustering for arrow visualization
 \item \verb+Metric+ - Metric type
-\item \verb+ClusteringParameters+
+\item \verb+ClusteringParametersArrows+
+\item \verb+ClusteringParametersColors+
 \item \verb+VisualizationParameters+
 \item \verb+VisualizerColor+ - Color visualizer object
 \item \verb+VisualizerArrow+ - Arrow visualizer object
@@ -357,5 +367,7 @@ The behavior of the job is fully determined by a configuration package class cal
 \item \verb+Scene1Arrows+ - The {\it primary scene} (or an empty {\it scene}) for arrow visualization baking
 \item \verb+Scene2Arrows+ - The {\it reference scene} (or an empty {\it scene}) for inverted arrow visualization baking
 \end{itemize}
+
+The are two \verb+DiffVector+ instances to support different clustering for arrow visualization and color visualization as described in section \ref{implemetation-user_interface}.
 
 Once a job is initialized with this package, its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffVector+ class, initializes it and calls its methods according to the configuration package. The thread is started together with a dialog window which shows progress and at the same time prevents the user from doing anything else with the program. Once the visualization process finishes, the program checks whether it has finished successfully or not and assigns based on that either renders the computed visualization {\it scenes} or reports an error and renders the raw {\it scenes}.

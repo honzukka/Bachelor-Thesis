@@ -8,7 +8,7 @@ Visualization of the difference between two triangle meshes\footnotemark is ofte
 \stepcounter{footnote}\footnotetext{The word ``morphometrics'' is of Greek origin and means ``the quantitative analysis of form''.}
 \stepcounter{footnote}\footnotetext{Triangle meshes used in this thesis have over 15,000 vertices and it is not uncommon for triangle meshes of regular objects to have over 100,000 vertices.}
 
-We will first examine how visualizations are handled in publicly available software, mention their disadvantages and then we will state how we aim to improve them.
+We will first examine how mesh difference visualizations are handled in publicly available software, we will mention their disadvantages and then we will state how we aim to improve them.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -26,7 +26,7 @@ Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshe
 
 \begin{itemize}
 \item Corresponding vertex distance (Fig. \ref{fig:morpho_example})
-\item Corresponding vertex distance projected into the surface normal
+\item Corresponding vertex distance projected into surface normal
 \item Angle between corresponding surface normals
 \item FESA\footnotemark
 \item Curvature difference
@@ -39,7 +39,7 @@ The disadvantage of these color-based visualizations is that they fail to captur
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{./img/morpho-example01.PNG}
-\caption[Morphome3cs - Vertex difference visualization]{Morphome3cs - Vertex difference visualization}
+\caption[Morphome3cs - Corresponding vertex distance visualization]{Morphome3cs - Corresponding vertex distance visualization}
 \label{fig:morpho_example}
 \end{figure}
 
@@ -59,20 +59,20 @@ The disadvantage of these color-based visualizations is that they fail to captur
 \caption{Visualizations in MeshLab and CloudCompare}
 \end{figure}
 
-Other approaches can be found for example in MeshLab \footnote{\citet{MeshLab}} (Fig. \ref{fig:meshlab_example}) or CloudCompare\footnote{\citet{CloudCmp}} (Fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly without the homologization step using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is also able to visualize the difference between two arbitrary triangle meshes (or even a triangle mesh and a point cloud or two point clouds). It does it by finding the nearest triangle to a given vertex, computing the distance between them and encoding this metric into color \citep{CloudCmpDistance}.
+Other approaches can be found for example in MeshLab \footnote{\citet{MeshLab}} (Fig. \ref{fig:meshlab_example}) or CloudCompare\footnote{\citet{CloudCmp}} (Fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly without the homologization step using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is also able to visualize the difference between two arbitrary triangle meshes (or even a triangle mesh and a point cloud or two point clouds) without homologization. It does it by finding the nearest triangle to a given vertex, computing the distance between them and encoding this metric into color \citep{CloudCmpDistance}.
 
 \footnotetext{One-sided Hausdorff Distance between two point sets \(S_1, S_2\) is defined as \(E(S_1, S_2) = \max_{p \in S_1} (\min_{p' \in S_2} d(p, p'))\) where \(d\) is the Euclidean distance between two points. Details of the computation used in MeshLab can be found in \citet{Metro98}.}
 
-Another drawback of the presented visualizations is that they only capture local differences. This makes answering questions such as ``Which face has a larger nose?'' more difficult because the observer has to synthesize various local differences on their own. Such a method is then time-consuming and prone to inaccuracies.
+Another drawback of the presented visualizations is that they only capture local differences. This makes answering questions such as ``Which face has a larger nose?'' more difficult because the observer has to synthesize various local pieces of information on their own. Such an approach is then time-consuming and prone to inaccuracies.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section*{Our Goal}
 
-In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create an arrow-based visualization technique combined with clustering which will be able to display multidimensional information and also group similar information together automatically. As a proof of concept, we will apply it in various visualizations using the corresponding vertex distance metric because this metric suffers from information loss when visualized using colors. Other metrics which can be represented by arrows can be easily added. We will follow the approach applied in Morphome3cs, therefore our input will be two homologous triangle meshes. We will focus on the visual appearance of the devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be conducted to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
+In order to overcome the limitations of the above color-based visualizations, this thesis is looking to create an arrow-based visualization technique combined with clustering which will be able to display multidimensional information and also group similar information together automatically. As a proof of concept, we will apply it in various visualizations using the corresponding vertex distance metric because this metric suffers from information loss when visualized using colors only. Other metrics which can be represented by arrows can be easily added. We will follow the approach applied in Morphome3cs, therefore our input will be two homologous triangle meshes. We will focus on the visual appearance of the devised visualizations and their implementation in an experimental application called MeshDiff. Lastly, a user study will be conducted to assess the quality of the new visualizations in various use cases. This study will serve as a basis for further development and potential incorporation of the visualizations into Morphome3cs.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section*{Thesis Structure}
 
-Chapter 1 of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter 2 delves into the implementation details of the visualizations in MeshDiff. Chapter 3 provides user documentation of MeshDiff and chapter 4 presents the results of the user study.
+Chapter 1 of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter 2 delves into the implementation details of the visualizations in MeshDiff. Chapter 3 presents the results of the user study. MeshDiff parameter description and user documentation can be found in the attachments.

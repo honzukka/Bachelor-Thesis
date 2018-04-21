@@ -1,11 +1,18 @@
 \chapter{Problem Analysis \& Solution}
 \label{sec:analysis}
 
+In this chapter, we will outline the process of devising our visualizations and we will finish the chapter by the presentation of the resulting visualizations themselves.
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Problem Input}
+
 We will start by illustrating the input to our visualization problem.
 
 Our input are two homologous triangle meshes which are to be compared. In order to clearly distinguish between these two meshes, we will call one of them the {\it primary mesh} and the other one will be the {\it reference mesh}. The mesh which carries the visualization is always the {\it primary mesh}. For example, Fig. \ref{fig:morpho_example} shows a {\it primary mesh}. The visualization demonstrates how different this {\it primary mesh} is from its {\it reference mesh}.
 
-For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using only colors. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric only has one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
+For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using colors only. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric has only one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
 
 After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it primary mesh}. For a better understanding, here is the meaning of such a representation in case of both chosen metrics:
 
@@ -14,13 +21,13 @@ After a difference metric is computed, it is placed as a 3D vector in the corres
 \item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When a unit surface normal is multiplied by this number it yields our vector placed in a vertex of the {\it primary mesh}.
 \end{itemize}
 
-We will split the vectors into two groups. Vectors which have an acute angle with the positive surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:input}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
+We will split the vectors into two groups. Vectors which have an acute angle with the surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:input}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
 
 \begin{figure}[h]
 \centering
 \def\svgwidth{\textwidth}
 \input{./illustrations/input_illustration.pdf_tex}
-\caption[Input Illustration]{A simplified schema of difference metric vectors. Yellow and blue arrows represent corresponding vertex distance, whereas red arrows show how the distance is projected into surface normal. Yellow arrows point {\it outwards} and blue arrows point {\it inwards}. Notice that all arrows are placed in the {\it primary mesh} and point towards the {\it reference mesh}.}
+\caption[Input Illustration]{A simplified 2D schema of difference metric vectors. Yellow and blue arrows represent corresponding vertex distance, whereas red arrows show how the distance is projected into surface normals. Yellow arrows point {\it outwards} and blue arrows point {\it inwards}. Notice that all arrows are placed in the {\it primary mesh} and point towards the {\it reference mesh}.}
 \label{fig:input}
 \end{figure}
 
@@ -31,12 +38,12 @@ To summarize, we are now working with a {\it primary mesh} containing vectors in
 %%-----------------------------------------------------------------------------------------
 \section{Seeing Mesh Difference as a Vector Field}
 
-If all vectors were drawn directly onto the {\it primary mesh}, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}). We also need a way to group similar vectors together to provide a more global difference visualization which existing color-based visualizations described in the introduction are incapable of.
+If all vectors were drawn directly onto the {\it primary mesh} as arrows, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff_unclustered}). We also need a way to group similar vectors together to provide a more global difference visualization which existing color-based visualizations described in the introduction are incapable of.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.5\textwidth]{./img/meshdiff-unclustered_arrows-single.png}
-\caption[MeshDiff - Vertex distance visualized by unclustered arrows]{MeshDiff - Vertex distance visualized by unclustered arrows}
+\caption[MeshDiff - Corresponding vertex distance visualized by unclustered arrows]{MeshDiff - Corresponding vertex distance visualized by unclustered arrows}
 \label{fig:meshdiff_unclustered}
 \end{figure}
 
@@ -44,9 +51,9 @@ One way to solve this problem is to devise a simple abstraction and use tools av
 
 Vectors saved in the vertices of a triangle mesh form a discrete bounded vector field. Visualization of discrete vector fields is a very active research area with applications in engineering, molecular modelling and computational fluid dynamics. There exist many scientific papers studying this topic, such as \citet{Telea99}, \citet{Garcke00}, \citet{Du04} or \citet{Peng12}.
 
-Drawing inspiration from these papers we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information.
+Drawing inspiration from these papers, we will employ a clustering technique to reduce the number of vectors and subsequently visualize this reduced information.
 
-To summarize again, we are now visualizing a discrete bounded vector field.
+To summarize, we are now visualizing a discrete bounded vector field.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -146,7 +153,7 @@ The preference of hierarchical clustering over other mentioned clustering method
 \centering
 \def\svgwidth{\textwidth}
 \input{./illustrations/forest_dendrogram.pdf_tex}
-\caption[Forest Dendrogram]{An illustration of clustering with the optional condition enabled and the resulting dendrogram. It is impossible to cover the whole dataset with less than four clusters.}
+\caption[Forest Dendrogram]{An illustration of {\it signed clustering} and the resulting dendrogram. In this case, it is impossible to cover the whole dataset with less than four clusters.}
 \label{fig:forest_dendrogram}
 \end{figure}
 
@@ -162,7 +169,7 @@ Besides clustering error computation, merging is the second crucial part of a hi
 
 \subsubsection{Summary}
 
-Our clustering method will use the hierarchical algorithm and CPU-based clustering computation from \citet{Telea99} with the added optional condition of merging only clusters whose representative vectors both point in the same direction - either {\it inwards} or {\it outwards}. We will use the error function from \citet{Peng12} (see Eq. \ref{eq:clustering_error}). Merging of two clusters will be done by computing the area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
+Our clustering method will use the hierarchical algorithm and CPU-based clustering computation from \citet{Telea99} ({\it simple clustering}) with the added optional condition of merging only clusters whose representative vectors both point in the same direction - either {\it inwards} or {\it outwards} ({\it signed clustering}). We will use the error function from \citet{Peng12} (see Eq. \ref{eq:clustering_error}). Merging of two clusters will be done by computing the area-weighted average of their representative vectors and assigning the resulting vector to the newly formed cluster.
 
 After the clustering step, we are visualizing a set of clusters, each of which has a representative vector which encodes a difference metric averaged across the whole cluster.
 %%-----------------------------------------------------------------------------------------

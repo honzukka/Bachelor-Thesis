@@ -12,6 +12,8 @@ As mentioned in section \ref{sec:implementation_algorithm}, the proposed visuali
 \subsection{Clustering Parameters}
 \label{sec:clustering_parameters}
 
+The following parameters are separate for color and arrow visualizations.
+
 \begin{description}
 \item [Cluster Count] Determines the number of clusters to be retrieved from the dendrogram (see Fig. \ref{fig:telea-hierarchical_clustering}) and used for visualization. If the dendrogram is a tree, any valid number of clusters is guaranteed to cover the whole data set. If the dendrogram is a forest (see section \ref{sec:analysis_clustering_algorithm}), certain parts of the data set may remain uncovered by the chosen clusters. {\bf Valid values:} \(\bm{[1,S]}\) where \(S\) is the number of vertices of one of the {\it scenes}.
 \item [Direction Significance] Determines how large the direction weight coefficient in the error function (see Eq. \ref{eq:clustering_error}) will be. See section \ref{sec:parameter_effect} for details. It is only meaningful in combination with all the other significance parameters\footnotemark. {\bf Valid values:} \(\bm{[0,100]}\)
@@ -65,9 +67,9 @@ The rest of the parameters comprise the viewing angle and zoom of both {\it scen
 \item [Zoom Left \& Right] Determines the zoom factor of the mesh view. {\bf Valid values: Not limited.} (The default value is 1.)
 \item [Rotation Left \& Right] Determines the viewing angle of a mesh. {\bf Valid values: Any 4x4 rotation matrix.}
 \item [Metric] Determines the metric type used in difference computation. (See section \ref{sec:analysis}.) {\bf Valid values: \{Distance, NormalProjectedDistance\}}
-\item [Clustering Type] Determines the type of clustering used in the visualization process. (See section \ref{sec:implementation_clustering}.) {\bf Valid values: \{None, Simple, Signed\}}
-\item [Color Visualization] Determines the type of color visualization used. (See section \ref{sec:analysis-color}.) {\bf Valid values: \{None, VertexRelative, VertexAbsolute, ClusterRandom, ClusterRelative, ClusterAbsolute\}}
-\item [Arrow Visualization] Determines whether arrow visualization is used. {\bf Valid values: \{True, False\}}
+\item [Clustering Type] Determines the type of clustering used in the visualization process. (See section \ref{sec:implementation_clustering}.) Separate for color and arrow visualizations. {\bf Valid values: \{None, Simple, Signed\}}
+\item [Color Visualization] Determines the type of color visualization used. (See section \ref{sec:analysis-color}.) {\bf Valid values: \{None, Random, Relative, Absolute\}}
+\item [Arrow Visualization] Determines whether arrow visualization is used. {\bf Valid values: \{Yes, No\}}
 \end{description}
 
 %%-----------------------------------------------------------------------------------------
