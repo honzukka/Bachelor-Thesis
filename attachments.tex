@@ -170,9 +170,13 @@ MeshDiff is a graphical program running on Windows operating systems which allow
 
 \footnotetext{See footnotes \ref{foot:triangle_mesh} and \ref{foot:homologous}.}
 
+\subsection{How do I obtain the correct input data?}
+
+As mentioned above, MeshDiff requires the input triangle meshes to be homologous. Homologization of two arbitrary triangle meshes can be done in publicly available software, for example in Morphome3cs \citep{Morpho}. The data we have used in the thesis was kindly provided to us by the Laboratory of 3D Imaging and Analytical Methods of the Faculty of Science at Charles University where it can be requested from.
+
 \subsection{How do I begin?}
 
-Once you have two homologous triangle meshes you wish to compare (homologization can be done for example in Morphome3cs), load one of them into the left panel and the other one into the right panel:
+Once you have two homologous triangle meshes you wish to compare, load one of them into the left panel and the other one into the right panel:
 
 \begin{description}
 \item [To load the left mesh:] \verb+File > Load Model 1+, and choose the \verb+.obj+ or \verb+.ply+ file you wish to load
@@ -180,6 +184,7 @@ Once you have two homologous triangle meshes you wish to compare (homologization
 \end{description}
 
 \subsection{How do I control the view?}
+\label{sec:view_control}
 
 You can view the meshes interactively by clicking and dragging the mouse cursor over them. You can also zoom in and out using the mouse wheel.
 

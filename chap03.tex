@@ -1,3 +1,62 @@
 \chapter{User Study}
 
-Present the study and its results.
+In this chapter, we will concern ourselves with the user study we conducted, its setting, its results and the implications they bring.
+
+\section{Setting}
+
+The goal of our study was to simulate use cases of the visualizations and assess their performance in those use cases. We have prepared 10 questions, each of them tied to a specific pair of triangle meshes and the difference between them. For each question, we have prepared four different visualizations of the difference between the two meshes. Each participant had to answer each question with the help of one visualization randomly chosen out of the four. At the end, we have compared the answers received for each question among all four visualizations along with the time elapsed by the time the given participant confirmed their answer. In certain cases, we knew in advance what the correct answer to a given question was, in other cases the correct answer was unknown. Good visualizations therefore had to either help the participant answer correctly or create a clear agreement among the majority of participants.
+
+\subsection{Data}
+
+All triangle meshes used in the study were 3D scans of human faces kindly provided to us by the Laboratory of 3D Imaging and Analytical Methods of the Faculty of Science at Charles University. Overall, we have used six distinct mesh pairs to be able to study a larger range of difference and also to make the study more interesting to the participants.
+
+\subsection{Visualizations}
+
+For each question, we have chosen the four visualizations to be presented to the participants according to the following rules:
+
+\begin{itemize}
+\item Meshes without a visualization have to be included to allow for the contribution of visualizations in general to be measured
+\item A visualization which we expected to be the most suitable for the given task according to out prediction outlined in section \ref{sec:analysis-color} has to be included
+\item The remaining visualizations should be as distinct as possible in order to capture possible error in our predictions
+\item At least one existing and one new visualization has to be included to allow for the differences between their performance to be captured
+\item Each visualization type presented in this thesis has to be present at least once in the whole data set
+\end{itemize}
+
+After applying the visualizations to the six chosen mesh pairs, we have received 25 distinct pairs.
+
+\subsection{Questions}
+
+We have created the following types of questions based on the way one can answer them:
+
+\begin{description}
+\item [Left/Right] In these questions, participants had to answer by clicking on one of the meshes
+\item [Yes/No] In these questions, participants had to answer by choosing either ``Yes'' or ``No'' from a dropdown menu
+\item [Direction] In these questions, a specific direction selected from a dropdown menu was considered as an answer
+\item [Location] Similarly, in these question, participants chose one of six predefined locations in a mesh in order to answer
+\end{description}
+
+Each question type also provided the possibility to answer ``Not sure'' when the participant did not understand the question or if the question was too difficult for them.
+
+\subsection{Program}
+
+We have modified MeshDiff for the purposes of the study. The only features which remained from MeshDiff were the ability to load and interactively view pre-generated visualizations and to modify the view by toggles described in appendix \ref{sec:view_control}. We have added a tutorial at the beginning which gives the full instructions to the participant (no prior knowledge is expected) and let them answer one sample question. 
+
+We will now describe the course of one session of the study. At the beginning the participant receives full instructions (no prior knowledge of the program nor the subject of the study is required) and answers one sample question. The program then provides feedback to the answer and explains why it was correct or incorrect. Ten other questions are then presented, each begins with a description of the visualization currently being shown. After the participant agrees they have understood the description, the program starts to secretly measure time. When the answer is chosen and confirmed, time elapsed is saved along with the value of the provided answer and the next question is presented.
+
+The study program runs locally without the ability to connect to the Internet and the participant has to manually upload the file containing their answers to a provided URL after they have finished.
+
+\subsection{Participants}
+
+Total of 36 volunteers of various backgrounds, ages and nationalities have participated in the study. Due to this number being relatively low, we were not able to analyze the answers of domain experts and the general public separately, nor were we able to make any other distinction. The primary intention, however, was to target the general public because we believe that this is aligned with the purpose of visualizations as a tool to make the understanding of data or concepts easier.
+
+\section{Results}
+
+We enclose the complete results of the study in attachment ... In this section, we will discuss the most significant results which are related to the limitations of existing visualization mentioned in the introduction or to the expected performance of new visualizations outlined in section \ref{sec:analysis-color}.
+
+\subsection{The Overall Contribution of Visualizations}
+
+\subsection{The Limitation of Color}
+
+\subsection{The Strength of Thresholding}
+
+\subsection{The Unexpected Benefit of Arrows}
