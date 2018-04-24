@@ -1,7 +1,17 @@
 # TeX compilation files
 *.pdf
 *.gz
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.out
+*.toc
 
 # JabRef temp files
 *.bak
 *.sav
+
+# PDF/A temp metadata
+*.xmpi
