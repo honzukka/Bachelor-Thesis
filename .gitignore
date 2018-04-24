@@ -1,11 +1,10 @@
 # TeX compilation files
-*.pdf
+/*.pdf
 *.gz
 *.aux
 *.bbl
 *.blg
-*.lof
-*.log
+*.lo[gf]
 *.out
 *.toc
 

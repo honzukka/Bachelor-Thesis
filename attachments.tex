@@ -296,5 +296,21 @@ Click \verb+File > Load Parameters+ and choose the desired \verb+.ini+ file. In 
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{User Study Results}
+\label{sec:study-complete_results}
+
+In this attachment, the complete results of the user study are enclosed. Each page covers one question and includes the question itself, screenshots of all four associated visualizations and a table with the distribution of answers and normalized average answer times for each visualization. We will now explain how we computed the normalized average answer times.
+
+Each participant has a different overall speed of answering. Consider participants \(p_i \text{ where } i = 1, 2, \dotsc, n\), questions \(q_j \text{ where } j = 1, 2, \dotsc, m\) and the answer times for each participant and question \(t(p_i,q_j)\). In order to eliminate these differences, we compute the average answer times \(\overline{t}(p_i,q)\) for each participant separately and created a normalization coefficient \(c_i\) where
+
+\[\frac{1}{c_i} = \frac{\overline{t}(p_i,q)}{{\max_{j} \overline{t}(p_j,q)}}.\] 
+
+Once the answer times are normalized, we need to compare them among different visualizations. To achieve that, we compute the average normalized answer times for each question and visualization. Because of the way participants are assigned to visualization groups (see Fig. \ref{fig:study_setting}), we decompose the set of all participants into equivalence classes \(V_1,V_2,V_3,V_4\) and compute the averages using the following formula:
+
+\[\widehat{t}(p,q_j,V_k) = \frac{\sum_{i; p_i \in V_k}^{}(c_i \cdot t(p_i,q_j))}{n}\]
+
+This implies that the normalized average times included in the tables are relative and therefore do not represent any standard units such as seconds or minutes.
+
+The following page begins with the results of the first question.
+\clearpage
 
 \input{study_results.tex}
