@@ -1,24 +1,42 @@
 \chapter{Discussion}
 
-In this chapter, we conclude the user study with a discussion of its results and setting and we suggest possible future improvements. In addition to that, we also include other observations and results of the new visualizations.
+In this chapter, we will conclude the user study with a discussion of its results and suggest possible future improvements both to the study and to mesh difference visualizations in general.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
-\section{Study}
+\section{Significant Results}
 
-We begin with an overview of the most significant results of the user study.
+We will begin with an overview of the most significant results of the user study.
 
 %%-----------------------------------------------------------------------------------------
-\subsection{Significant Results}
+\subsection{The Overall Contribution of Visualizations}
 
-We have picked four questions from the study which fulfilled out expectations from section \ref{sec:analysis-color} to a certain extent or even yielded unexpected outcome.
+The answers to question 7 (see appendix \ref{sec:study-question7}), which requires participants to click on the face which has larger cheekbones, has shown an overwhelming dominance of visualizations over raw triangle meshes. Any of the three types of visualizations presented helped participants to answer correctly, whereas when no visualization was shown, answers were almost equally distributed among all the possible options. Moreover, when participants were shown meshes without a visualization, it took them longer to arrive at an answer. Similar effect could be observed in the answers to question 8 (see appendix \ref{sec:study-question8}).
 
-\subsubsection{The Overall Contribution of Visualizations}
+%%-----------------------------------------------------------------------------------------
+\subsection{The Strength of Thresholding}
 
-The answers to question 7 (see appendix \ref{sec:study-question7}), which requires participants to click on the face which has larger cheekbones has shown an overwhelming dominance of visualizations over raw triangle meshes. Any of the three types of visualizations presented helped participants to answer correctly, whereas once the visualization was missing, answers were almost equally distributed among all the possible options. Moreover, when participants were shown meshes without a visualization, it took them longer to arrive at a wrong answer. Similar effect could be observed in the answers to question 8 (see appendix \ref{sec:study-question8}).
+In question 3 (see appendix \ref{sec:study-question3}), we tried to assess the performance of thresholding in a task which it was expected to excel at (see section \ref{sec:analysis_visualizations}), the visualization of the largest difference. We found that when the threshold was set just under the largest metric value, it was very easy for participants to identify the correct location. On the other hand, when a basic color visualization without thresholding was shown, the spread of answers was the largest and participants took the longest to answer. However, there are two interesting points associated with this question which we have to mention here:
+
+\begin{itemize}
+	\item This question clearly shows that participants were unsure what is meant by ``left'' and ``right'', even though this was explained at the beginning of the study.  
+	\item Answers provided when no visualization was shown suggest that basic difference metrics mentioned in this thesis are insufficient in cases where the term ``difference'' is interpreted more globally. Humans are very sensitive to facial features and tend to see the differences between them more globally. This could also be observed in the answers to question 9 (see appendix \ref{sec:study-question9}).
+\end{itemize}
+
+%%-----------------------------------------------------------------------------------------
+\subsection{The Unexpected Benefit of Arrows}
+
+Question 9 (\ref{sec:study-question9}) has also shown a phenomenon which was not expected (see section \ref{sec:analysis_visualizations}). The question was aimed at the absolute value of the difference and where it was the smallest. Thresholding performed well as expected but most correct answers were given when arrows were shown. This shows that the length of an arrow is much more suggestive than the color scale when capturing the absolute value of a difference metric.
+
+TODO: {\it the} screenshot goes here!
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
-\section{Visualizations}
+\section{Study Improvements}
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
+\section{Visualization Improvements}
