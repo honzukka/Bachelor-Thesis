@@ -16,6 +16,7 @@ The answers to question 7 (see appendix \ref{sec:study-question7}), which requir
 
 %%-----------------------------------------------------------------------------------------
 \subsection{The Strength of Thresholding}
+\label{sec:discussion-thresholding}
 
 In question 3 (see appendix \ref{sec:study-question3}), we tried to assess the performance of thresholding in a task which it was expected to excel at (see section \ref{sec:analysis_visualizations}), the visualization of the largest difference. We found that when the threshold was set just under the largest metric value, it was very easy for participants to identify the correct location. On the other hand, when a basic color visualization without thresholding was shown, the spread of answers was the largest and participants took the longest to answer. However, there are two interesting points associated with this question which we have to mention here:
 
@@ -29,14 +30,31 @@ In question 3 (see appendix \ref{sec:study-question3}), we tried to assess the p
 
 Question 9 (\ref{sec:study-question9}) has also shown a phenomenon which was not expected (see section \ref{sec:analysis_visualizations}). The question was aimed at the absolute value of the difference and where it was the smallest. Thresholding performed well as expected but most correct answers were given when arrows were shown. This shows that the length of an arrow is much more suggestive than the color scale when capturing the absolute value of a difference metric.
 
-TODO: {\it the} screenshot goes here!
-
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{Study Improvements}
 
+Because of time-constraints we were not able to improve the study and conduct it again in order to obtain a more complete and thorough comparison between color-based and arrow-based visualizations. A more detailed study would also be able to capture the differences between various clustering methods and clustering parameters which was beyond the resolving power of our study. In this section, we propose several improvements which might help to create such a study.
+
+The most obvious limitation of our study was its scale. However, several other circumstances have further hindered our findings:
+
+\begin{itemize}
+	\item The overall presentation of the study did not attract enough attention. We recommend to design a web application with a modern and responsive interface which would allow for the sessions to be shorter, easier and more enjoyable to the participants. Being presented with a modern web application also adds to the feeling that the subject being studied is modern and relevant as well.
+	\item A special attention should be given to the introduction of the study. Our results, such as \ref{sec:study-question3}, have shown that even though the way directions are given was explained in an introductory text, this text was too long and participants were not able to process it. This introduced error into the provided answers. We recommend to create an interactive introduction, rather than text-based.
+	\item The last point related to user experience, which we believe is key, is the way questions are worded. Questions 4 (\ref{sec:study-question4}) and 5 (\ref{sec:study-question5}) have proven to be too complicated because of the amount of directions and concepts included in them. An example of a good question is question 7 (\ref{sec:study-question7}).
+	\item Stepping away from user experience, we have noticed a problem related to the focus of the study. Our study has mixed questions related to visualizations (e.g. question 6 \ref{sec:study-question6}) with questions related to metrics (e.g. question 3 \ref{sec:study-question3}). On one hand, this allowed us to capture the need for more sophisticated difference metrics, on the other hand, it has not contributed to the comparison between various visualization types as strongly.
+	\item Another problem related to this is the choice of data. As was mentioned in section \ref{sec:discussion-thresholding}, the difference metrics we have studied are not suitable for capturing the difference between human faces which people usually tend to see. While these metrics might still be useful in certain cases, this is not very clear from out study because of the data set chosen. We recommend to use more neutral objects in order to eliminate this phenomenon.
+\end{itemize}
+
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
-\section{Visualization Improvements}
+\section{Method Improvements}
+
+In order to improve the new visualizations presented in this thesis, a more detailed user study should be conducted as outlined above. However, during the course of our work we have discovered other possible improvements which were out of scope of this thesis. We present these here.
+
+\begin{itemize}
+	\item Firstly, the clustering process used in our visualization algorithm (see section \ref{sec:analysis_clustering_algorithm}), more specifically the dendrogram allows for an interactive visualization to be created. The user would be presented with the visualization of only one cluster covering the whole mesh. By clicking on a cluster, its children would be extracted instead from the dendrogram. This would result in a clustering of adaptive detail depending on the specific needs of the user.
+	\item As mentioned in section \ref{sec:discussion-thresholding}, difference metrics included in this thesis are not sufficient in certain cases, such as when measuring the difference between facial features. A possible next step would be to devise global difference metrics which would better correspond to the idea of difference in shape that humans have. As a consequence, clustering would not be required because information would be reduced inherently.
+\end{itemize}
