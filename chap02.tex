@@ -28,7 +28,7 @@ We are using an implementation of triangle mesh boundary representation with a c
 \centering
 \def\svgwidth{0.5\textwidth}
 \input{./illustrations/corner_table.pdf_tex}
-\caption[Corner Table Illustration]{An illustartion of the corner table. The black corner has direct access to all red elements - its vertex and certain surrounding corners}
+\caption[Corner Table Illustration]{An illustration of the corner table. The black corner has direct access to all red elements - its vertex and certain surrounding corners}
 \label{fig:corner_table}
 \end{figure}
 
@@ -42,7 +42,7 @@ We have added several methods to this implementation in order for us to be able 
 
 The core class of MeshDiff which encapsulates the visualization algorithm is called \verb+DiffVector+. The name of the class suggests that it works with difference metrics which can be represented by a 3D vector. \verb+DiffVector+ is initialized by the {\it primary scene} and the {\it reference scene} and therefore only operates on these two specific {\it scenes} throughout its whole lifetime.
 
-The main public method of \verb+DiffVector+ is \verb+CreateVisualization()+. It is mainly responsible for metric computation and data point clustering. All this computed data is stored inside \verb+DiffVector+ instances. When the clustering is ready, a visualization is created and outputted from \verb+CreateVisualization()+ using a visualizer object.
+The main public method of \verb+DiffVector+ is \verb+CreateVisualization()+. It is mainly responsible for metric computation and vector clustering. All this computed data is stored inside \verb+DiffVector+ instances. When the clustering is ready, a visualization is created and outputted from \verb+CreateVisualization()+ using a visualizer object.
 
 The fact that all intermediate results are stored inside a \verb+DiffVector+ instance means that when \verb+CreateVisualization()+ is called again, data which is difficult to compute, especially the vector clustering, can be reused if possible.
 
@@ -274,13 +274,13 @@ Arrow visualizer objects only have one field which is initialized in the constru
 
 The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{sec:analysis_visualizations} and on visualization parameters supplied. Colors are assigned to the arrow {\it scenes} depending on whether the representative vector points {\it inwards} or {\it outwards} (see appendix \ref{sec:visualization_parameters}). All created arrow {\it scenes} are then copied into the output {\it scene} supplied.
 
-The inverted visualization is obtained by multiplying the representative vector by -1 and reassigning the arrow {\it scene} colors according to this version of the vector.
+The inverted visualization is obtained by multiplying the representative vector by -1 and assigning the arrow {\it scene} colors based on this version of the vector.
 
 \subsubsection{Color Visualizers}
 
 For each color visualization type mentioned in section \ref{sec:analysis_visualizations} there is a separate visualizer class. These classes determine how color is assigned to vertices. In general, each visualizer loops though all \verb+Cluster+ instances supplied and for each of them it generates a color based on the metric value for that cluster. Clusters which passed through thresholding receive a color based on the length of the representative vector and its orientation (see appendix \ref{sec:visualization_parameters}). Once a color is created, it is inserted into a list at precisely those indices which belong to the \verb+PrimaryArrows+ (see section \ref{sec:implementation_clustering}) of the associated cluster. It is important to respect this indexing in order to make the mapping of the colors to the {\it scene} vertices easier. The colors are then applied to the vertices of the output {\it scene} supplied\footnotemark.
 
-The inverted visualization is also obtained by multiplying the representative vector by -1 and reassigning the arrow {\it scene} colors according to this version of the vector.
+The inverted visualization is also obtained by multiplying the representative vector by -1 and generating the colors based on this version of the vector.
 
 \footnotetext{It is worth mentioning that when the clusters supplied to this visualizer correspond to the original vectors (i.e. no clustering was performed), a per-vertex visualization is generated similar to those in MeshLab or Morphome3cs (see the introduction).}
 
@@ -315,19 +315,19 @@ We have added several modifications to this basic setup to support the rendering
 \begin{itemize}
 \item We have added a second viewing panel for the inverted visualization on the {\it reference mesh} (see section \ref{sec:implementation_visualizers}). This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
 \item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done be routing the mouse events from the view panels either to both \verb+Trackball+ instances or only to the intended one.
-\item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once had to be added to the rendering methods. In the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{sec:implementation_visualizers}).
-\item Lastly, the user is able to switch between viewing the computed visualizations and the raw triangle meshes. Visualization {\it scenes} (original with colors and a separate one with arrows) and raw {\it scenes} (only original ones) are therefore stored separately for these actions to happen quickly. Also, rendering methods now are now more flexible to make the transition between rendering various {\it scenes} easier.
+\item When visualizations are to be created, the visualizer objects (see section \ref{sec:implementation_visualizers}) are supplied with copies of the raw {\it scenes} to bake the visualizations to. These visualization {\it scenes} are then stored alongside the raw scene. This allows users to quickly switch between viewing visualizations and raw {\it scenes}. When a new visualization is requested, another pair of copies is be made out of the raw {\it scenes} and when the visualization is baked, it replaced the old visualization pair.
+\item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once was added to the rendering methods. In the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{sec:implementation_visualizers}).
 \end{itemize}
 
-For an illustration of the last two points, see Fig. \ref{fig:scenes_explained}.
-
 \begin{figure}[h]
-\centering
-\def\svgwidth{\textwidth}
-\input{./illustrations/scenes_explained.pdf_tex}
-\caption[Scenes Explained]{An illustration of the two view panels of MeshDiff and various scenes which can be displayed in them.}
-\label{fig:scenes_explained}
+	\centering
+	\def\svgwidth{\textwidth}
+	\input{./illustrations/scenes_explained.pdf_tex}
+	\caption[Scenes Explained]{An illustration of the two view panels of MeshDiff and various scenes which can be displayed in them.}
+	\label{fig:scenes_explained}
 \end{figure}
+
+To summarize, next to the pair of raw {\it scenes} we also store four additional {\it scenes}: one pair for the raw {\it scenes} with color visualizations and one pair only for arrows. See Fig. \ref{fig:scenes_explained} for an illustration of this.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{User Interface}
