@@ -59,14 +59,17 @@
     \put(0.68233328,0.52217616){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}scene2\end{tabular}}}}%
     \put(0.62912013,0.30172493){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}scene2Colors\\scene2Arrows\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{./illustrations/scenes_explained.pdf}}%
-    \put(0.21237578,0.08459031){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}{\it primary}\end{tabular}}}}%
-    \put(0.6736182,0.08537678){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}{\it reference}\end{tabular}}}}%
+    \put(0.18921361,0.07568174){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}{\it (reference)}\end{tabular}}}}%
+    \put(0.6736182,0.07646821){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}rendered\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{./illustrations/scenes_explained.pdf}}%
     \put(0.35099605,0.59508977){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}raw\end{tabular}}}}%
     \put(0.81452495,0.59444774){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}raw\end{tabular}}}}%
-    \put(0.29576316,0.38841191){\color[rgb]{1,0.785,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}visualization\end{tabular}}}}%
+    \put(0.29576316,0.38841191){\color[rgb]{0,0.66,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}visualization\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{./illustrations/scenes_explained.pdf}}%
-    \put(0.73841966,0.39047724){\color[rgb]{1,0.785,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}visualization\end{tabular}}}}%
+    \put(0.73841966,0.39047724){\color[rgb]{0,0.66,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}visualization\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{./illustrations/scenes_explained.pdf}}%
+    \put(0.21267556,0.12571465){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}rendered\end{tabular}}}}%
+    \put(0.65610096,0.12828285){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}{\it (reference)}\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{./illustrations/scenes_explained.pdf}}%
   \end{picture}%
 \endgroup%

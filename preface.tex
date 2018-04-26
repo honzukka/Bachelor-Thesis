@@ -25,7 +25,7 @@ Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshe
 \footnotetext{\label{foot:homologous}Two triangle meshes are homologous if they have the same number of vertices, edges and triangles and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(w_i \in Mesh_2\). Similarly for edges and triangles.}
 
 \begin{itemize}
-\item Corresponding vertex distance (Fig. \ref{fig:morpho_example})
+\item Corresponding vertex distance (Fig. \ref{fig:morpho-example})
 \item Corresponding vertex distance projected into surface normal
 \item Angle between corresponding surface normals
 \item FESA\footnotemark
@@ -40,7 +40,7 @@ The disadvantage of these color-based visualizations is that they fail to captur
 \centering
 \includegraphics[width=0.5\textwidth]{./img/morpho-example01.PNG}
 \caption[Morphome3cs - Corresponding vertex distance visualization]{Morphome3cs - Corresponding vertex distance visualization}
-\label{fig:morpho_example}
+\label{fig:morpho-example}
 \end{figure}
 
 \begin{figure}[h]
@@ -48,18 +48,18 @@ The disadvantage of these color-based visualizations is that they fail to captur
 	\begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshlab-example01.PNG}
     \caption[MeshLab - Hausdorff Distance visualization]{MeshLab - Hausdorff Distance visualization}
-    \label{fig:meshlab_example}
+    \label{fig:meshlab-example}
 	\end{subfigure}
     \qquad
     \begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\textwidth]{./img/cloudcompare-example01.PNG}
     \caption[CloudCompare - Vertex distance visualization]{CloudCompare - Vertex distance visualization}
-    \label{fig:cloudcompare_example}
+    \label{fig:cloudcompare-example}
 	\end{subfigure}
 \caption{Visualizations in MeshLab and CloudCompare}
 \end{figure}
 
-Other approaches can be found for example in MeshLab \footnote{\citet{MeshLab}} (Fig. \ref{fig:meshlab_example}) or CloudCompare\footnote{\citet{CloudCmp}} (Fig. \ref{fig:cloudcompare_example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly without the homologization step using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is also able to visualize the difference between two arbitrary triangle meshes (or even a triangle mesh and a point cloud or two point clouds) without homologization. It does it by finding the nearest triangle to a given vertex, computing the distance between them and encoding this metric into color \citep{CloudCmpDistance}.
+Other approaches can be found for example in MeshLab \footnote{\citet{MeshLab}} (Fig. \ref{fig:meshlab-example}) or CloudCompare\footnote{\citet{CloudCmp}} (Fig. \ref{fig:cloudcompare-example}). In MeshLab, the difference between two arbitrary triangle meshes can be visualized directly without the homologization step using the Hausdorff Distance\footnotemark encoded into color. CloudCompare is also able to visualize the difference between two arbitrary triangle meshes (or even a triangle mesh and a point cloud or two point clouds) without homologization. It does it by finding the nearest triangle to a given vertex, computing the distance between them and encoding this metric into color \citep{CloudCmpDistance}.
 
 \footnotetext{One-sided Hausdorff Distance between two point sets \(S_1, S_2\) is defined as \(E(S_1, S_2) = \max_{p \in S_1} (\min_{p' \in S_2} d(p, p'))\) where \(d\) is the Euclidean distance between two points. Details of the computation used in MeshLab can be found in \citet{Metro98}.}
 
@@ -75,4 +75,4 @@ In order to overcome the limitations of the above color-based visualizations, th
 %%-----------------------------------------------------------------------------------------
 \section*{Thesis Structure}
 
-Chapter 1 of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter 2 delves into the implementation details of the visualizations in MeshDiff. Chapter 3 presents the results of the user study and suggests possible future improvements. MeshDiff parameter description and user documentation can be found in the attachments.
+Chapter \ref{chap:analysis} of this thesis is concerned with the description of the proposed visualizations and the main ideas behind them. Chapter \ref{chap:implementation} delves into the implementation details of the visualizations in MeshDiff. Chapter \ref{chap:user_study} describes the user study conducted and chapter \ref{chap:discussion} presents the results of the study and suggests possible future improvements. MeshDiff parameter description and user documentation can be found in the attachments.

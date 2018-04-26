@@ -54,7 +54,7 @@
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{./illustrations/input_illustration.pdf}}%
-    \put(0.04499487,0.16558113){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}primary mesh\end{tabular}}}}%
+    \put(0.04499487,0.16558113){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}rendered mesh\end{tabular}}}}%
     \put(0.09025932,0.39380689){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}reference mesh\end{tabular}}}}%
   \end{picture}%
 \endgroup%
