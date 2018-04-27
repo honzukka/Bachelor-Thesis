@@ -66,10 +66,11 @@ To summarize, we are now visualizing a discrete bounded vector field.
 Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-clustering_subjectivity}) and there are numerous approaches to clustering available. For this reason we present an overview of clustering techniques used in vector field visualization to gain a better understanding of which technique might best suit our purposes and why.
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{./img/clustering_subjectivity.png}
-\caption[The subjectivity of clustering]{The subjectivity of clustering - are there two or four clusters in the image?}
-\label{fig:illustration-clustering_subjectivity}
+	\centering
+	\def\svgwidth{0.6\textwidth}
+	\input{./illustrations/clustering_subjectivity.pdf_tex}
+	\caption[The subjectivity of clustering]{The subjectivity of clustering. How many clusters are there in the image? Two? Four? Five?}
+	\label{fig:illustration-clustering_subjectivity}
 \end{figure}
 
 %%-----------------------------------------------------------------------------------------
@@ -83,18 +84,18 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-
 \stepcounter{footnote}\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the "distance" between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same "distance" from \(v\). The shape of the ellipse and the location of its center can be controlled by parameters. See Fig. \ref{fig:illustration-telea_hierarchical_clustering}.}
 
 \begin{figure}[h]
-\centering
+	\centering
 	\begin{subfigure}{0.5\textwidth}
-	\includegraphics[width=\textwidth]{./img/telea-hierarchical_clustering.PNG}
-    \caption{Various clusterings of a data set and the corresponding dendrogram}
+		\includegraphics[width=\textwidth]{./illustrations/telea-dendrogram-embedded_font.pdf}
+    	\caption{Various clusterings of a data set and the associated dendrogram. Clusters corresponding to the original data points are gray.}
 	\end{subfigure}
     \qquad
     \begin{subfigure}{0.3\textwidth}
-	\includegraphics[width=\textwidth]{./img/telea-ellipse-params.PNG}
-    \caption{The ellipse and its parameters.}
+		\includegraphics[width=\textwidth]{./illustrations/telea-ellipse_params-embedded_font.pdf}
+    	\caption{The ellipse and its parameters.}
     
-    \includegraphics[width=\textwidth]{./img/telea-ellipse-vectors.PNG}
-    \caption{The iso-error contours of multiple vectors}
+    	\includegraphics[width=\textwidth]{./illustrations/telea-ellipse_contours-embedded_font.pdf}
+    	\caption{The iso-error contours of multiple vectors}
 	\end{subfigure}
 \caption[The illustration of clustering in \citet{Telea99}]{The illustration of clustering in \citet{Telea99}}
 \label{fig:illustration-telea_hierarchical_clustering}
