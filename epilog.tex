@@ -1,4 +1,34 @@
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-Discuss the qualities of the visualizations (user study), potential future improvements and incorporation into Morphome3cs.
+In this thesis, we have addressed the problem of the visualization of the difference between two triangle meshes. A common way of approaching this problem is to first compute a difference metric, for example the distance between corresponding vertices of the two meshes. This metric is then visualized. Existing visualizations mostly encode the metrics into mesh vertex color which may lead to information loss, especially when the metrics are multidimensional. We have proposed a new way of visualizing these metrics focusing on the ability to display multidimensional information and to group similar information together in order to prevent cluttering.
+
+We have used the following two metrics (see Fig. \ref{fig:illustration-problem_input}):
+
+\begin{itemize}
+	\item Corresponding vertex distance	
+	\item Corresponding vertex distance projected into surface normal
+\end{itemize}
+
+The proposed visualizations are the following (see section \ref{sec:analysis-visualizations}):
+
+\begin{description}
+	\item [Arrows] Clustered metric vectors are visualized using arrows.
+	\item [Cluster color] Mesh vertices belonging to a given cluster are colored based on the properties of the cluster.
+	\item [Thresholding] We have introduced a high-pass filter on the visualizations which excludes all information which is not significant enough.
+	\item [Combined] Arrow-based and color-based visualizations can be combined to use the best of both worlds.
+\end{description}
+
+We have implemented these visualization in an experimental application called MeshDiff (see attachment \ref{attch:user_doc}) which we used to demonstrate the visualizations. The application can also be used more widely by people who want to create visualizations of their own data, export them, and present them in publications.
+
+We have also conducted a user study which helped us evaluate the new visualizations as well as existing ones. It has shown that our visualizations are superior in certain areas, especially when comparing the absolute values of a metric and when underlining the most significant differences (see section \ref{sec:discussion-sig_results}).
+
+\section*{Future Work}
+
+Our study has also shown several deficiencies, both in its own design and in the visualizations. We have discovered three main areas of potential future improvement.
+
+\begin{itemize}
+	\item A better organized and more thorough study would be able to further assess the newly proposed and existing visualizations. Our study did not include the comparison of various clustering settings, for example. We believe these results would help to further improve these visualizations (see section \ref{sec:discussion-study_improvements}).
+	\item Our study has suggested that existing difference metrics (which we have also used) are limited by their locality. Examining the differences between two human faces has manifested the need for more sophisticated global difference metrics (see section \ref{sec:discussion-method_improvements}).
+	\item A new adaptive interactive visualization can be built on top of our clustering method where users would choose which areas they want to be visualized in more detail. This would further help to suppress unnecessary information (see section \ref{sec:discussion-method_improvements}).
+\end{itemize}
