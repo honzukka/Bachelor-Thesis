@@ -224,7 +224,14 @@ There are other toggles in the \verb+View+ menu, all of which modify the view in
 
 Once you have loaded both triangle meshes and set the view according to your taste, you can create a visualization of the difference between the two meshes. Please, see chapter \ref{chap:analysis} for a thorough analysis of all the visualization that MeshDiff supports.
 
-Basic configuration of a visualization can be done in the main window of MeshDiff. The \verb+Arrow Visualization+ and \verb+Color Visualization+ dropdowns allow you to choose specific types of both visualizations. You can disable either of them by choosing \verb+No+ and \verb+None+ respectively, but it is also possible to combine them together.
+Basic configuration of a visualization can be done in the main window of MeshDiff (see Fig. \ref{fig:meshdiff-creating_visualization}). The \verb+Arrow Visualization+ and \verb+Color Visualization+ dropdowns allow you to choose specific types of both visualizations. You can disable either of them by choosing \verb+No+ and \verb+None+ respectively, but it is also possible to combine them together.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{./img/meshdiff-vis_settings.PNG}
+	\caption[MeshDiff - Creating a visualization]{MeshDiff - Creating a visualization}
+	\label{fig:meshdiff-creating_visualization}
+\end{figure}
 
 Once the visualization types have been chosen, optional clustering can be added to the visualization process to display more general information. Clustering can be configured independently for both arrow visualization and color visualization. The required clustering type can be set via \verb+Clustering for Arrows+ and \verb+Clustering for Colors+ dropdowns and once a non-empty type is chosen, the corresponding trackbar will become active. The values of the trackbars determine the number of clusters which will be displayed for a given visualization type.
 
@@ -241,10 +248,10 @@ If you have selected a certain clustering type for your visualization and are no
 Click \verb+Settings > Clustering Parameters+ to view the following window:
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=1\textwidth]{./img/meshdiff-clustering_parameters.PNG}
-\caption[MeshDiff - Clustering Parameters]{MeshDiff - Clustering Parameters Configuration Window}
-\label{fig:meshdiff-clustering_parameters_window}
+	\centering
+	\includegraphics[width=0.8\textwidth]{./img/meshdiff-clustering_parameters.PNG}
+	\caption[MeshDiff - Clustering parameters]{MeshDiff - Clustering parameters configuration window}
+	\label{fig:meshdiff-clustering_parameters_window}
 \end{figure}
 
 The checked radio button at the bottom signifies which parameters are currently being edited. The trackbar values determine the relative significance, in other words, \verb+Position Significance+ at 80 and with other values at 40 gives the same result as \verb+Position Significance+ at 40 with other values at 20.
@@ -255,13 +262,29 @@ Click \verb+Save+ to remember current values.
 \subsection{How do I change visualization appearance?}
 \label{attch:user_doc_vis_params}
 
-Appearance parameters, such as colors, arrow size and other can be configured by clicking \verb+Setting > Visualizer Parameters+. The following window will then appear:
+Visualization parameters, such as colors, arrow size and others can be configured by clicking \verb+Setting > Visualizer Parameters+. The configuration window is divided into three parts. In the first part, the appearance of arrows can be configured (see Fig. \ref{fig:meshdiff-visualizer_parameters_arrows}). The second part allows you to configure colors (see Fig. \ref{fig:meshdiff-visualizer_parameters_colors}) and the third one is meant for thresholding configuration (see Fig. \ref{fig:meshdiff-visualizer_parameters_thresholding}).
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=1\textwidth]{./img/meshdiff-visualizer_parameters.PNG}
-\caption[MeshDiff - Visualizer Parameters]{MeshDiff - Visualizer Parameters Configuration Window}
-\label{fig:meshdiff-visualizer_parameters_window}
+	\centering
+	\includegraphics[width=0.8\textwidth]{./img/meshdiff-visualizer_parameters-arrows.PNG}
+	\caption[MeshDiff - Visualizer parameters - Arrows]{MeshDiff - Visualizer parameters configuration window - Arrows}
+	\label{fig:meshdiff-visualizer_parameters_arrows}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{0.6\textwidth}
+		\includegraphics[width=\textwidth]{./img/meshdiff-visualizer_parameters-colors.PNG}
+		\caption{Color settings}
+		\label{fig:meshdiff-visualizer_parameters_colors}
+	\end{subfigure}
+	\qquad
+	\begin{subfigure}{0.3\textwidth}
+		\includegraphics[width=\textwidth]{./img/meshdiff-visualizer_parameters-thresholding.PNG}
+		\caption{Thresholdng settings}
+		\label{fig:meshdiff-visualizer_parameters_thresholding}
+	\end{subfigure}
+	\caption[MeshDiff - Visualizer parameters - Colors \& Thresholding]{MeshDiff - Visualizer parameters configuration window - Colors \& Thresholding}
 \end{figure}
 
 See attachment \ref{attch:parameter_desc-visualization_parameters} for a detailed description of these parameters.
@@ -285,7 +308,7 @@ When you do that and your visualization contains arrows, you will be asked if yo
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{./img/meshdiff-separate_arrows.PNG}
+\includegraphics[width=0.5\textwidth]{./img/meshdiff-separate_arrows.PNG}
 \caption[MeshDiff - Export Prompt]{MeshDiff - Export Prompt}
 \label{fig:meshdiff-separate_arrows_prompt}
 \end{figure}
@@ -335,7 +358,7 @@ Once the answer times are normalized, we need to compare them among different vi
 
 This implies that the normalized average times included in the tables are relative and therefore do not represent any standard units such as seconds or minutes.
 
-The following page begins with the results of the first question.
-\clearpage
+%The following page begins with the results of the first question.
+%\clearpage
 
 \input{study_results.tex}

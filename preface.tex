@@ -20,6 +20,13 @@ Our main reference program will be Morphome3cs\footnotemark, a piece of software
 
 \footnotetext{\citet{Morpho}}
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./img/morpho-example01.PNG}
+	\caption[Morphome3cs - Corresponding vertex distance visualization]{Morphome3cs - Corresponding vertex distance visualization}
+	\label{fig:morpho-example}
+\end{figure}
+
 Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshes from two arbitrary triangle meshes and use it to compute and visualize the difference between them. Currently, Morphome3cs is able to produce color-based visualizations of multiple difference metrics. These metrics are:
 
 \footnotetext{\label{foot:homologous}Two triangle meshes are homologous if they have the same number of vertices, edges and triangles and there is a one-to-one mapping between them. Vertices are numbered and vertex \(v_i \in Mesh_1\) corresponds to vertex \(w_i \in Mesh_2\). Similarly for edges and triangles.}
@@ -35,13 +42,6 @@ Morphome3cs is able to generate a homologous\footnotemark pair of triangle meshe
 \footnotetext{Finite Element Surface Analysis - captures the difference between corresponding triangle areas}
 
 The disadvantage of these color-based visualizations is that they fail to capture multidimensional information. For example, when using corresponding vertex distance as a metric, it is impossible to encode both its magnitude and its direction into color at the same time while maintaining visual clarity.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.5\textwidth]{./img/morpho-example01.PNG}
-\caption[Morphome3cs - Corresponding vertex distance visualization]{Morphome3cs - Corresponding vertex distance visualization}
-\label{fig:morpho-example}
-\end{figure}
 
 \begin{figure}[h]
 \centering

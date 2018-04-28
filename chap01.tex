@@ -15,6 +15,14 @@ Our input are two homologous triangle meshes which are to be compared. In order 
 
 For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using colors only. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric has only one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
 
+\begin{figure}[h]
+	\centering
+	\def\svgwidth{\textwidth}
+	\input{./illustrations/input_illustration.pdf_tex}
+	\caption[Input Illustration]{A simplified 2D schema of difference metric vectors. Yellow and blue arrows represent corresponding vertex distance, whereas red arrows show how the distance is projected into surface normals. Yellow arrows point {\it outwards} and blue arrows point {\it inwards}. Notice that all arrows are placed in the {\it rendered mesh} and point towards the {\it reference mesh}.}
+	\label{fig:illustration-problem_input}
+\end{figure}
+
 After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it rendered mesh}. For a better understanding, here is the meaning of such a representation in case of both chosen metrics:
 
 \begin{itemize}
@@ -23,14 +31,6 @@ After a difference metric is computed, it is placed as a 3D vector in the corres
 \end{itemize}
 
 We will split the vectors into two groups. Vectors which have an acute angle with the surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:illustration-problem_input}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
-
-\begin{figure}[h]
-\centering
-\def\svgwidth{\textwidth}
-\input{./illustrations/input_illustration.pdf_tex}
-\caption[Input Illustration]{A simplified 2D schema of difference metric vectors. Yellow and blue arrows represent corresponding vertex distance, whereas red arrows show how the distance is projected into surface normals. Yellow arrows point {\it outwards} and blue arrows point {\it inwards}. Notice that all arrows are placed in the {\it rendered mesh} and point towards the {\it reference mesh}.}
-\label{fig:illustration-problem_input}
-\end{figure}
 
 To summarize, we are now working with a {\it rendered mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an arrow-based visualization. See Fig. \ref{fig:illustration-problem_input} for a schema of this situation.
 
@@ -90,7 +90,7 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-
     	\caption{Various clusterings of a data set and the associated dendrogram.}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 		\includegraphics[width=\textwidth]{./illustrations/telea-ellipse_params-embedded_font.pdf}
     	\caption{The ellipse and its parameters.}
     
@@ -194,8 +194,8 @@ Once a clustering of a vector field is obtained, representative vectors of all c
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.3\textwidth]{./img/8sided_arrow.PNG}
-\caption[Arrow Model]{Wireframe view of the 3D arrow model}
+\includegraphics[width=0.3\textwidth]{./img/arrow_model.PNG}
+\caption[Arrow Model]{The 3D model used for arrow visualizations}
 \label{fig:meshdiff-arrow_model8}
 \end{figure}
 
@@ -205,34 +205,35 @@ The scale of the 3D arrows also reflects the geometrical area of the clusters. T
 
 Lastly, and most importantly, the direction of the representative vector is reflected directly in the direction of the 3D arrow. In addition to that, Arrows pointing {\it inwards} can have a different color than arrows pointing {\it outwards} to make their differentiation easier for the user.
 
-We have therefore managed to encode three-dimensional information into our visualization.
+We have therefore managed to encode three-dimensional information into our visualization. See Fig. \ref{fig:meshdiff-arrows}.
 
 \begin{figure}[h]
 \centering
-	\begin{subfigure}{0.3\textwidth}
+	\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-5-count20-single.png}
     \caption{\((0.5,5,20)\)}
     \label{fig:meshdiff-arrows_5-20}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-5-count125-single.png}
     \caption{\((0.5,5,125)\)}
     \label{fig:meshdiff-arrows_5-125}
 	\end{subfigure}
     
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-1-count20-single.png}
     \caption{\((0.5,1,20)\)}
     \label{fig:meshdiff-arrows_1-20}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-arrows-interval0_5-1-count125-single.png}
     \caption{\((0.5,1,125)\)}
     \label{fig:meshdiff-arrows_1-125}
 	\end{subfigure}
 \caption[MeshDiff - Arrow visualizations with various parameter settings]{MeshDiff - Arrow visualizations with various parameter settings\footnotemark}
+\label{fig:meshdiff-arrows}
 \end{figure}
 
 \footnotetext{Parameter format in captions: {\tt ([minimum height \& width scale],[maximum height \& width scale],[cluster count])}}
@@ -246,7 +247,7 @@ Arrow visualizations combined with clustering are expected to perform well in an
 
 Next, we introduce two color visualizations of clusters: random and metric-based.
 
-Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster or a color based on the length of the representative vector of the cluster is assigned. The former case is basically the original color visualization of a metric, only applied to clusters.
+Both of these visualizations need to be aware of which mesh vertices belong to a given cluster. Then either a random color is assigned to all vertices in a given cluster (see Fig. \ref{fig:meshdiff-clustercolor_random}) or a color based on the length of the representative vector of the cluster is assigned (see Fig \ref{fig:meshdiff-clustercolor_metric}). The former case is basically the original color visualization of a metric, only applied to clusters.
 
 We propose two modes of assigning the color to the vertices based on metrics, the relative mode and the absolute mode. In both modes, a distinct user-defined color hue is assigned to clusters whose representative vectors point {\it inwards} and {\it outwards}. Also, the metric value here is the length of the associated vector. What differentiates the two modes is the shade assigned to clusters of specific metric value.
 
@@ -256,13 +257,13 @@ In the absolute mode, black color is assigned to cluster of zero metric value an
 
 \begin{figure}[h]
 \centering
-	\begin{subfigure}{0.3\textwidth}
+	\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-clustercolor-random.PNG}
     \caption{Random}
     \label{fig:meshdiff-clustercolor_random}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-clustercolor-metric.PNG}
     \caption{Metric-based}
     \label{fig:meshdiff-clustercolor_metric}
@@ -280,23 +281,24 @@ Metric-based cluster color is expected to perform well in cases when we have fou
 \subsection{Thresholding}
 \label{subsec:analysis-visualizations-thresholding}
 
-For all types of metric-based visualizations including the original color-based ones we present thresholding. The thresholding is either applied to clusters whose metric values are too low or clusters whose area is too small. It acts as a high-pass filter and all visualization elements related to the metric or cluster which has not passed the thresholding is excluded from the result.
+For all types of metric-based visualizations including the original color-based ones we present thresholding. The thresholding is either applied to clusters whose metric values are too low or clusters whose area is too small. It acts as a high-pass filter and all visualization elements related to the metric or cluster which has not passed the thresholding is excluded from the result. See Fig. \ref{fig:meshdiff-thresholding}.
 
 \begin{figure}[h]
 \centering
-	\begin{subfigure}{0.3\textwidth}
+	\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-thresholding-clustercolor-length3.PNG}
     \caption{Vertices of excluded clusters are grayed out}
     \label{fig:meshdiff-thresholding_clustercolor}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-thresholding-arrows-length3.PNG}
-    \caption{Arrows which represent excluded clusters are missing}
+    \caption{Arrows of excluded clusters are missing}
     \label{fig:meshdiff-thresholding_arrows}
 	\end{subfigure}
     
 \caption[MeshDiff - Thresholded visualizations]{MeshDiff - Thresholded visualizations where clusters with metric values less than 3 are excluded}
+\label{fig:meshdiff-thresholding}
 \end{figure}
 
 \subsubsection{Expected Performance}
@@ -306,7 +308,7 @@ Thresholding is expected to enhance the effect of metric-based cluster color vis
 \subsection{Combined Visualizations}
 \label{subsec:analysis-visualizations-combined}
 
-The last visualization type presented in this thesis is the combination of color and arrow visualizations.
+The last visualization type presented in this thesis is the combination of color and arrow visualizations. See Fig. \ref{fig:meshdiff-combination}.
 
 \begin{figure}[h]
 \centering
@@ -339,44 +341,44 @@ A specific configuration of these parameters can influence the outcome of the cl
 \subsection{Direction Weight}
 \label{subsec:analysis-parameter_effect-direction}
 
-High direction weight forms many small clusters in areas of high surface curvature and large clusters in flat areas. Therefore, it mostly captures the high-curvature changes of shape. Resulting clusters have uneven sizes.
+High direction weight forms many small clusters in areas of high surface curvature and large clusters in flat areas. Therefore, it mostly captures the high-curvature changes of shape. Resulting clusters have uneven sizes. See Fig. \ref{fig:meshdiff-high_direction}.
 %%-----------------------------------------------------------------------------------------
 \subsection{Position Weight}
 \label{subsec:analysis-parameter_effect-position}
 
-Setting the position weight higher than others results in clusters of even size where each of them represents the overall difference in a certain area regardless of the variety of directions and magnitudes in that area.
+Setting the position weight higher than others results in clusters of even size where each of them represents the overall difference in a certain area regardless of the variety of directions and magnitudes in that area. See Fig. \ref{fig:meshdiff-high_position}.
 %%-----------------------------------------------------------------------------------------
 \subsection{Magnitude Weight}
 \label{subsec:analysis-parameter_effect-magnitude}
 
-Magnitude weight can play a significant role when using the metric-based cluster color visualization because its high value will highlight iso-magnitude contours like in a geographical map. Such an approach can be useful when grouping and segmenting areas with a certain absolute value of the difference metric.
+Magnitude weight can play a significant role when using the metric-based cluster color visualization because its high value will highlight iso-magnitude contours like in a geographical map. Such an approach can be useful when grouping and segmenting areas with a certain absolute value of the difference metric. See Fig. \ref{fig:meshdiff-high_magnitude}.
 %%-----------------------------------------------------------------------------------------
 \subsection{Resolution Weight}
 \label{subsec:analysis-parameter_effect-resolution}
 
-High resolution weight prefers clustering in sparse areas of the mesh and will therefore increase the precision of the visualization in very dense areas. This effect partially complements high direction weight because high-curvature areas of triangle meshes are usually more dense in order for the high curvature to be captured well in the mesh.
+High resolution weight prefers clustering in sparse areas of the mesh and will therefore increase the precision of the visualization in very dense areas. This effect partially complements high direction weight because high-curvature areas of triangle meshes are usually more dense in order for the high curvature to be captured well in the mesh. See Fig. \ref{fig:meshdiff-high_resolution}.
 
 \begin{figure}[h]
 \centering
-	\begin{subfigure}{0.3\textwidth}
+	\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-high_direction.PNG}
 	\caption{High direction}
 	\label{fig:meshdiff-high_direction}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-high_position.PNG}
 	\caption{High position}
 	\label{fig:meshdiff-high_position}
 	\end{subfigure}
     
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-high_magnitude.PNG}
 	\caption{High magnitude}
 	\label{fig:meshdiff-high_magnitude}
 	\end{subfigure}
     \qquad
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\textwidth]{./img/meshdiff-high_resolution.PNG}
 	\caption{High resolution}
 	\label{fig:meshdiff-high_resolution}
