@@ -1,7 +1,7 @@
 \chapter{Problem Analysis \& Solution}
 \label{chap:analysis}
 
-In this chapter, we will outline the process of devising our visualizations and we will finish the chapter by the presentation of the resulting visualizations themselves.
+In this chapter, we will explain the difference visualization problem more thoroughly and we will outline the process of designing our new visualizations. We will conclude the chapter by presenting the resulting visualizations and some of~their properties.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -9,11 +9,11 @@ In this chapter, we will outline the process of devising our visualizations and 
 \section{Problem Input}
 \label{sec:analysis-input}
 
-We will start by illustrating the input to our visualization problem.
+We will begin by illustrating the input to our visualization problem.
 
-Our input are two homologous triangle meshes which are to be compared. In order to clearly distinguish between these two meshes, we will call one of them the {\it rendered mesh} and the other one will be the {\it reference mesh}. The mesh which carries the visualization is the {\it rendered mesh}. For example, Fig. \ref{fig:morpho-example} shows a {\it rendered mesh}. The visualization demonstrates how different this {\it rendered mesh} is from its {\it reference mesh}.
+Our input are two homologous triangle meshes which are to be compared. In~order~to clearly distinguish between these two meshes, we will call one of~them the {\it rendered mesh} and the other one the {\it reference mesh}. The mesh which carries the visualization is the {\it rendered mesh}. For example, Fig. \ref{fig:morpho-example} shows a {\it rendered mesh}. The visualization demonstrates how different this {\it rendered mesh} is from its {\it reference mesh}.
 
-For the purposes of our arrow-based visualization technique, it is suitable to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric used in Morphome3cs suffers from information loss when visualized using colors only. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric has only one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
+For the purposes of our arrow-based visualization technique, it is appropriate to use difference metrics which can be represented by 3D vectors because these can be directly rendered as arrows. We will restrict ourselves to corresponding vertex distance because this metric, used in Morphome3cs, suffers from information loss when visualized using colors only. In addition to that, we will also include corresponding vertex distance projected into surface normal despite the fact that this metric has only one dimension. We will use it to compare arrow-based and color-based visualizations. Other metrics can be easily added if needed.
 
 \begin{figure}[h]
 	\centering
@@ -23,16 +23,16 @@ For the purposes of our arrow-based visualization technique, it is suitable to u
 	\label{fig:illustration-problem_input}
 \end{figure}
 
-After a difference metric is computed, it is placed as a 3D vector in the corresponding vertex of the {\it rendered mesh}. For a better understanding, here is the meaning of such a representation in case of both chosen metrics:
+After a difference metric is computed, it is placed into the corresponding vertices of the {\it rendered mesh} in the form of 3D vectors. For a better understanding, here is the meaning of such a representation in case of both chosen metrics:
 
 \begin{itemize}
 \item For corresponding vertex distance, a vector is placed in the vertex of the {\it rendered mesh} and if both meshes were overlaid, its apex would lie in the corresponding vertex of the {\it reference mesh}. This is therefore the most straightforward difference metric and it carries information in multiple dimensions, namely tangential difference and normal difference.
-\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When a unit surface normal is multiplied by this number it yields our vector placed in a vertex of the {\it rendered mesh}.
+\item For corresponding vertex distance projected into surface normal, the situation is largely similar, only the metric has lost the dimension of tangential difference and is only represented by a single number. When a unit surface normal is multiplied by this number, it yields our vector placed in a vertex of the {\it rendered mesh}.
 \end{itemize}
 
-We will split the vectors into two groups. Vectors which have an acute angle with the surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:illustration-problem_input}). This differentiation will become more meaningful when the meshes in question are for example human faces or other enclosed objects which are very common in geometric morphometrics.
+We will split the vectors into two groups. Vectors which have an acute angle with the surface normal will be said to point {\it outwards} and all other vectors will be said to point {\it inwards} (see Fig. \ref{fig:illustration-problem_input}). This differentiation will become more meaningful when the underlying meshes are for example human faces or other enclosed objects which are very common in geometric morphometrics.
 
-To summarize, we are now working with a {\it rendered mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an arrow-based visualization. See Fig. \ref{fig:illustration-problem_input} for a schema of this situation.
+To summarize, we are now working with a {\it rendered mesh} containing vectors in all its vertices and we are looking for a way to visualize these vectors using an~arrow-based visualization. See Fig. \ref{fig:illustration-problem_input} for a schema of this situation.
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -40,7 +40,7 @@ To summarize, we are now working with a {\it rendered mesh} containing vectors i
 \section{Seeing Mesh Difference as a Vector Field}
 \label{sec:analysis-abstraction}
 
-If all vectors were drawn directly onto the {\it rendered mesh} as arrows, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff-unclustered_vis}). We also need a way to group similar vectors together to provide a more global difference visualization which existing color-based visualizations described in the introduction are incapable of.
+If all vectors were drawn directly onto the {\it rendered mesh} as arrows, the visualization would become too cluttered (see Fig. \ref{fig:meshdiff-unclustered_vis}). We also need a way to group similar vectors together to provide a more global difference visualization which existing color-based visualizations described in the introduction are incapable of~providing.
 
 \begin{figure}[h]
 \centering
@@ -80,8 +80,8 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-
 \citet{Telea99} use hierarchical clustering\footnotemark where neighboring clusters with the lowest clustering error are merged first. Each cluster has a representative vector and during the merge, the weighted average of the two vectors is computed and assigned to the newly formed cluster. In order to compute the clustering error, the paper introduced elliptic iso-error contours\footnotemark. This clustering method is primarily aimed at 2D rectilinear vector fields but can be also used in 3D when the error function is modified appropriately. It is possible to use up to seven parameters to configure the clustering.
 
 \addtocounter{footnote}{-2}
-\stepcounter{footnote}\footnotetext{Hierarchical clustering, also called bottom-up clustering, starts with each data point representing an elementary cluster. In each step of the algorithm, two clustering candidates are found from the available clusters according to certain criteria and subsequently merged. Hierarchical clustering creates a binary tree, also called a dendrogram, where each node represents a cluster and has two children from which it was created. Arbitrary number of clusters covering the whole data set can then be obtained by taking roots of disjoint subtrees which, when combined, contain all the leaves of the dendrogram. See Fig. \ref{fig:illustration-telea_hierarchical_clustering}.}
-\stepcounter{footnote}\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the "distance" between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same "distance" from \(v\). The shape of the ellipse and the location of its center can be controlled by parameters. See Fig. \ref{fig:illustration-telea_hierarchical_clustering}.}
+\stepcounter{footnote}\footnotetext{Hierarchical clustering, also called bottom-up clustering, starts with each data point representing an elementary cluster. In each step of the algorithm, two clustering candidates are found from the available clusters according to certain criteria and subsequently merged. Hierarchical clustering creates a binary tree, also called a dendrogram, where each node represents a cluster and has two children from which the cluster was created. Arbitrary number of clusters covering the whole data set can then be obtained by taking roots of disjoint subtrees which, when combined, contain all the leaves of the dendrogram. See Fig. \ref{fig:illustration-telea_hierarchical_clustering}.}
+\stepcounter{footnote}\footnotetext{Clustering error in \citet{Telea99} is computed by measuring the ``distance'' between the representative vectors \(v, w\) of the two clusters. The elliptic iso-error contour is an ellipse which has a center on the line determined by \(v\) and intersects the apex of \(w\). All vectors \(w'\) which share the same ellipse have the same ``distance'' from \(v\). The shape of the ellipse and the location of its center can be controlled by parameters. See Fig. \ref{fig:illustration-telea_hierarchical_clustering}.}
 
 \begin{figure}[h]
 	\centering
@@ -103,15 +103,15 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-
 
 \citet{Garcke00} use a continuous clustering method\footnotemark based on the physical model of \citet{CahnHilliard58} which is used to describe phase separation and coarsening in binary alloys. This model is applied to vector field data which results in a diffusion problem rather than a splitting and merging problem. Their algorithm also assumes an either 2D or 3D rectilinear grid.
 
-\footnotetext{In continuous clustering methods, there is no notion of merging or splitting in each step of the algorithm. Instead, ``a continuous scale of successively coarser cluster sets" is created.}
+\footnotetext{In continuous clustering methods, there is no notion of merging or splitting in each step of~the algorithm. Instead, ``a continuous scale of successively coarser cluster sets" \citep{Garcke00} is created.}
 
-\citet{Du04} use iterative clustering\footnotemark where Voronoi regions\footnotemark are created around the initial cluster centers and a distance function is applied to each of them. The set of clusters which has the lowest value of the distance function is selected as the final cluster set. This method works with 2D and 3D rectilinear vector fields and can be influenced by two parameters and by the distribution of the initial clusters.
+\citet{Du04} use iterative clustering\footnotemark where Voronoi regions\footnotemark are created around the initial cluster centers and a distance function is applied to each of them. The set of clusters which has the lowest value of the distance function is selected as the final cluster set. This method works with 2D and 3D rectilinear vector fields and can be influenced by two parameters and by the distribution of~the initial clusters.
 
 \addtocounter{footnote}{-2}
-\stepcounter{footnote}\footnotetext{Iterative clustering algorithms start by assigning the data points to a given number of clusters in a random way or by using a clustering approximation. In each step, the clustering error of all clusters is computed and data points are reassigned in a way which decreases the overall clustering error.}
-\stepcounter{footnote}\footnotetext{Voronoi diagram is a partitioning of a plane into regions. The partitioning is done by selecting some initial points as seeds. Then a region is formed around each seed in such a way that a point \(p\) of the plane belongs to the region of seed \(s\) if and only if \(d(p, s') \geq d(p, s) \forall s' \text{ seeds, such that } s' \neq s\).}
+\stepcounter{footnote}\footnotetext{Iterative clustering algorithms start by assigning the data points to a given number of~clusters in a random way or by using a clustering approximation. In each step, the clustering error of all clusters is computed and data points are reassigned in a way which decreases the overall clustering error.}
+\stepcounter{footnote}\footnotetext{Voronoi diagram is a partitioning of a plane into regions. The partitioning is done by selecting some initial points as seeds. Then a region is formed around each seed in such a way that a point \(p\) of the plane belongs to the region of seed \(s\) if and only if \(d(p, s') \geq d(p, s)\; \forall s' \text{ seeds such that } s' \neq s\).}
 
-\citet{Peng12} use hierarchical clustering similar to \citet{Telea99} with the difference that the clustering is computed on a GPU by encoding a given static view of the vector field into a rasterized image. The computation is then done for this specific image. In order to obtain the clustering error of clusters \(C_1, C_2\), a very simple formula is used:
+\citet{Peng12} use hierarchical clustering similar to \citet{Telea99} with the difference that the clustering is computed on a GPU by encoding a given static view of the vector field into a rasterized image. The computation is then done for this specific image. In order to obtain the clustering error of~clusters \(C_1, C_2\), a very simple formula is used:
 
 \begin{equation} \label{eq:clustering_error}
 \bm{e}(C_1,C_2) = k_d \cdot \frac{d_{C_1C_2}}{d_{max}} + k_v \cdot \frac{v_{C_1C_2}}{v_{max}} + k_\alpha \cdot \frac{\alpha_{C_1C_2}}{\alpha_{max}} + k_m \cdot \frac{m_{C_1C_2}}{m_{max}}
@@ -120,13 +120,13 @@ Clustering in general is a very subjective task (see Fig. \ref{fig:illustration-
 where \(k_d + k_v + k_\alpha + k_m = 1\) are weight coefficients. The other components are the following:
 
 \begin{itemize}
-\item \(d_{C_1C_2}\) is the Euclidean distance between the positions of the representative vectors of the clusters. The maximum distance \(d_{max}\) is the length of a diagonal of the geometry's bounding box
+\item \(d_{C_1C_2}\) is the Euclidean distance between the positions of the representative vectors of the clusters. The maximum distance \(d_{max}\) is the length of~a~diagonal of the geometry bounding box.
 \item \(v_{C_1C_2}\) is the difference between the lengths of the representative vectors and \(v_{max}\) is the largest length in the whole data set.
-\item \(\alpha_{C_1C_2}\) is angle between the representative vectors. The maximum angle is \(\alpha_{max} = 180^\circ\)
+\item \(\alpha_{C_1C_2}\) is angle between the representative vectors. The maximum angle is \(\alpha_{max} = 180^\circ\).
 \item \(m_{C_1C_2}\) is the sum of the mesh resolutions of the two clusters. \(m_{max}\) is the largest value of \(m\) in the whole data set.
 \end{itemize}
 
-The mesh resolution component also differentiates this approach from all others because it represents an approximation of the density of the underlying mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D vector fields. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
+The mesh resolution component differentiates this approach from all the others because it represents an approximation of the density of the underlying mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D vector fields. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
 %%-----------------------------------------------------------------------------------------
 \subsection{Selection Criteria for Our Clustering Method}
 \label{subsec:analysis-field_clustering-sel_criteria}
@@ -141,7 +141,7 @@ For our visualization purposes, we will utilize fragments of the presented clust
 
 Methods which are suitable for our specific vector field (i.e. a triangle mesh with a vector in each vertex) will help us tailor the clustering process and achieve better results. 
 
-Simple methods will allow us to quickly obtain a baseline which will help us to decide which modifications will improve the algorithm in our conditions. 
+Simple methods will allow us to quickly obtain a baseline which will help us decide which modifications will improve the algorithm in our conditions. 
 
 Lastly, the ease of user configuration will make our algorithm user-friendly and therefore it will increase the adoption rate.
 
