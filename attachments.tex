@@ -85,7 +85,7 @@ In this section, we describe how MeshDiff can write its configuration to a file 
 \subsection{Format}
 \label{attch:parameter_load_store-format}
 
-Each file is divided into sections which are delimited by a special line containing the name of the section. What follows are key/value pairs, one pair per line. Here is an example of a full configuration file:
+Each file is divided into sections which are delimited by a special line containing the name of the section and a customizable decoration. What follows are key/value pairs, one pair per line. Here is an example of a full configuration file:
 
 \begin{code}
 ---Trackball Left---
@@ -137,8 +137,8 @@ arrowVisualization=No
 All lines which do not fulfill any of the following requirements are ignored:
 
 \begin{itemize}
-\item Start with \verb+---+
-\item Yield exactly two strings upon split at \verb+=+
+\item Starts with the decoration (in the above example this is \verb+---+)
+\item Yields exactly two strings upon split at \verb+=+
 \end{itemize}
 
 The format of keys and values is defined by the program.
@@ -148,9 +148,9 @@ The format of keys and values is defined by the program.
 
 We have written \verb+ParameterWriter+ and \verb+ParameterReader+ classes which can be used in a similar way other I/O classes are used in C\#.
 
-\verb+ParameterReader+ is initialized with a file path and a section name which is the full delimiting string shown above. Then a \verb+ReadPair()+ method can be called in a loop and key/value pairs are returned as tuples. When there are no more pairs in the given section, \verb+null+ is returned. All objects of this class should be disposed of at the end of their lifetime.
+\verb+ParameterReader+ is initialized with a file path, a section name and optionally a decoration different to the default \verb+---+. Then a \verb+ReadPair()+ method can be called in a loop and key/value pairs are returned as tuples. When there are no more pairs in the given section, \verb+null+ is returned. All objects of this class should be disposed of at the end of their lifetime.
 
-\verb+ParameterWriter+ is also initialized with a file path and a section name and provides two methods: \verb+WritePair()+ and \verb+WriteEmptyLine()+. Both methods write to the given file and they always append to file. Upon the first call, a section of the given name is created and all subsequent calls write key/value pairs under that section. \verb+WritePair()+ can only accept arguments of type \verb+string+. This class also implements the \verb+IDisposable+ interface.
+\verb+ParameterWriter+ is initialized in a similar manner and provides two methods: \verb+WritePair()+ and \verb+WriteEmptyLine()+. Both methods write to the given file and they always append to file. Upon the first call, a section of the given name is created and all subsequent calls write key/value pairs under that section. \verb+WritePair()+ can only accept arguments of type \verb+string+. This class also implements the \verb+IDisposable+ interface.
 
 
 %%-----------------------------------------------------------------------------------------

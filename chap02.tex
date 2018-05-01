@@ -130,7 +130,7 @@ We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ insta
 \item \verb+Neighbors+ - a set of \verb+Cluster+ instances adjacent to the cluster
 \item \verb+Level+ - marks the step of the clustering algorithm in which this cluster was created (low number also means low clustering error in general), it is illustrated in Fig. \ref{fig:illustration-telea_hierarchical_clustering}
 \item \verb+RepresentativeArrow+ - an \verb+Arrow+ instance representing the metric value for this cluster
-\item \verb+Size+ - the geometrical area of the cluster
+\item \verb+Size+ - the geometrical area of the cluster. We have chosen this to be the sum of the areas of the underlying mesh triangles which belong to the cluster
 \item \verb+LeftChild+ and \verb+RightChild+ - \verb+Cluster+ instances out of which this cluster was created
 \item \verb+PrimaryArrows+ - a list of all the original unclustered \verb+Arrow+ instances which are tied directly to the underlying {\it scene} and which belong to this cluster
 \end{itemize}
@@ -174,6 +174,10 @@ Here is the extraction algorithms for forest dendrograms\footnote{Corresponds to
 \State i = 0;
 \While{i < requiredClusterCount}
 	\State highestCluster = chosenClusters.ExtractMax();
+	\If{highestCluster.Level == 0}
+		\State chosenClusters.Insert(highestCluster);
+		\State \textbf{break};
+	\EndIf
     \State chosenClusters.Insert(highestCluster.LeftChild);
     \State chosenClusters.Insert(highestClusters.RightChild);
     \State i++;
@@ -184,7 +188,9 @@ Here is the extraction algorithms for forest dendrograms\footnote{Corresponds to
 \end{algorithmic}
 \end{algorithm}
 
-Line 9 of algorithm \ref{algo:cluster_extract-forest} ensures that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection. This is necessary to return the cluster count requested but at the same time it introduces the limitation we discussed in section \ref{subsec:analysis-field_clustering-our_method} which is that for certain cluster counts, the returned clusters do not cover the whole {\it scene}.
+The condition on line 6 of algorithm \ref{algo:cluster_extract-forest} is fulfilled for example when five clusters are requested from the forest in Fig. \ref{fig:illustration-forest_dendrogram}. In this case, \verb+highestCluster+ is a root without any children. At the same time, however, all of these roots have already been added to \verb+chosenClusters+ on line 2. We therefore insert the \verb+highestCluster+ back and break the loop because there are no more clusters to discover. We will remove the redundant clusters in the next step.
+
+Line 12 of algorithm \ref{algo:cluster_extract-forest} ensures that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection. This is necessary to return the cluster count requested but at the same time it introduces the limitation we discussed in section \ref{subsec:analysis-field_clustering-our_method} which is that for certain cluster counts, the returned clusters do not cover the whole {\it scene}.
 
 If the desired clustering is not available (i.e. the corresponding dendrogram is not built), the clustering object performs the clustering algorithm. Here is the outline of it (largely similar to \citet{Telea99}):
 
@@ -228,9 +234,9 @@ If the desired clustering is not available (i.e. the corresponding dendrogram is
 \end{algorithmic}
 \end{algorithm}
 
-\verb+mergeClusters()+ and \verb+clusteringError+ are implemented exactly in accordance with section \ref{subsec:analysis-field_clustering-our_method}.
+\verb+mergeClusters()+ and \verb+clusteringError+ are implemented in accordance with section \ref{subsec:analysis-field_clustering-our_method}. We will now mention the most important implementation details of \verb+mergeClusters()+.
 
-It is worth mentioning that when a new cluster is created, it needs to be placed in the clustering space by modifying all neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. All other \verb+Cluster+ fields such as \verb+Size+, \verb+RepresentativeArrow+ including its orientation and others are computed and assigned to the newly formed cluster as well.
+First of all, when a new cluster is created, it needs to be placed in the clustering space by modifying all neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. The orientation of the new representative arrow is either inherited ({\it signed clustering}) or estimated based on the dominant orientation among the \verb+PrimaryArrows+ of the new cluster. New mesh resolution is obtained by averaging the resolutions of the two original clusters. Lastly, the size of the new cluster is computed directly when the cluster is sufficiently small, otherwise it is determined by the sum of the sizes of the original clusters.
 
 \subsubsection{Output}
 
@@ -322,7 +328,7 @@ We have added several modifications to this basic setup to support the rendering
 
 \begin{itemize}
 \item We have added a second viewing panel for the inverted visualization on the {\it reference mesh} (see section \ref{subsec:implementation-algorithm-visualization}). This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
-\item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done be routing the mouse events from the view panels either to both \verb+Trackball+ instances or only to the intended one.
+\item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done by first modifying the \verb+Trackball+ instance according to the mouse event associated with the view panel in was intended for and then copying the resulting rotation matrix from that instance to the second instance. Because the coordinates in the mouse events are tied to their view panels, simply routing the events to the second view panel would only work if both panels had the same dimensions. This solution is more general and bypasses coordinate recalculation.
 \item When visualizations are to be created, the visualizer objects (see section \ref{subsec:implementation-algorithm-visualization}) are supplied with copies of the raw {\it scenes} to bake the visualizations to. These visualization {\it scenes} are then stored alongside the raw scene. This allows users to quickly switch between viewing visualizations and raw {\it scenes}. When a new visualization is requested, another pair of copies is be made out of the raw {\it scenes} and when the visualization is baked, it replaced the old visualization pair.
 \item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once was added to the rendering methods. In the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{subsec:implementation-algorithm-visualization}).
 \end{itemize}
@@ -379,4 +385,6 @@ The behavior of the job is fully determined by a configuration package class cal
 
 The are two \verb+DiffAlgo+ instances to support different clustering for arrow visualization and color visualization as described in section \ref{subsec:implementation-architecture-user_interface}.
 
-Once a job is initialized with this package, its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffAlgo+ class, initializes it and calls its methods according to the configuration package. The thread is started together with a dialog window which shows progress and at the same time prevents the user from doing anything else with the program. Once the visualization process finishes, the program checks whether it has finished successfully or not and assigns based on that either renders the computed visualization {\it scenes} or reports an error and renders the raw {\it scenes}.
+Once a job is initialized with this package, its \verb+Run()+ method can be assigned to a thread. A job operates directly with the \verb+DiffAlgo+ class, initializes it and calls its methods according to the configuration package. The thread is started together with a dialog window which shows progress and enables the user to cancel the process. Once the visualization process finishes, the program checks whether it has finished successfully or not and assigns based on that either renders the computed visualization {\it scenes} or reports an error and renders the previously shown {\it scenes}.
+
+Checking for visualization cancellation is done mainly during the clustering loop because it is the most time-consuming part of the program. It is also done after the visualization is generated because otherwise the process would finish even when the user has requested a cancellation. When a process is canceled, all the intermediate data related to that process is deleted and the previously shown {\it scenes} are rendered.
