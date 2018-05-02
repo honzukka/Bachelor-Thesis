@@ -126,7 +126,18 @@ where \(k_d + k_v + k_\alpha + k_m = 1\) are weight coefficients. The other comp
 \item \(m_{C_1C_2}\) is the sum of the mesh resolutions of the two clusters. \(m_{max}\) is the largest value of \(m\) in the whole data set.
 \end{itemize}
 
-The mesh resolution component differentiates this approach from all the others because it represents an approximation of the density of the underlying mesh in a given local area. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. This method is therefore aimed at non-rectilinear 3D vector fields. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
+The mesh resolution component differentiates this approach from all the others because it represents an approximation of the density of the underlying mesh in a given local area\footnotemark. Including it in the error formula assigns higher error to dense clusters which results in a larger amount of clusters (higher precision) in dense areas of the mesh and a smaller amount of clusters (lower precision) in sparse areas of the mesh. To compute it, we use an approximation from \citet{Peng12} where for each vertex \(v\), \(m_v = \frac{1}{{\overline{e}}_{avg}}\) where \(\overline{e}_{avg}\) is the mean length of all edges from the neighborhood of \(v\) depicted in \ref{fig:illustration-mesh_resolution}.
+
+\footnotetext{We use the term {\it mesh resolution} in this thesis to be aligned with the terminology in \citet{Peng12}.}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{./illustrations/mesh_resolution.pdf}
+	\caption[Mesh Resolution]{Mesh Resolution}
+	\label{fig:illustration-mesh_resolution}
+\end{figure}
+
+This method is therefore aimed at non-rectilinear 3D vector fields. It has five parameters for user configuration (four weights and the number of clusters to be retrieved from the dendrogram).
 %%-----------------------------------------------------------------------------------------
 \subsection{Selection Criteria for Our Clustering Method}
 \label{subsec:analysis-field_clustering-sel_criteria}
@@ -281,7 +292,7 @@ Metric-based cluster color is expected to perform well in cases when we have fou
 \subsection{Thresholding}
 \label{subsec:analysis-visualizations-thresholding}
 
-For all types of metric-based visualizations including the original color-based ones we present thresholding. The thresholding is either applied to clusters whose metric values are too low or clusters whose area is too small. It acts as a high-pass filter and all visualization elements related to the metric or cluster which has not passed the thresholding is excluded from the result. See Fig. \ref{fig:meshdiff-thresholding}.
+For all types of metric-based visualizations including the original color-based ones we present thresholding. The thresholding excludes either clusters whose metric values are too low or clusters whose area is too small. Therefore all visualization elements related to a cluster which has not passed through the thresholding are not shown in the result. See Fig. \ref{fig:meshdiff-thresholding}.
 
 \begin{figure}[h]
 \centering

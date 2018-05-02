@@ -314,7 +314,7 @@ In this chapter, we will mention the platform MeshDiff is built on and intended 
 
 The reused code by Josef Pelikán is a C\# application with a WinForms user interface which uses the OpenTK library, encapsulating the OpenGL API, to render graphics. The only targeted operating system is Windows which is sufficient for our experimental purposes.
 
-In order to clearly mark which parts of MeshDiff are authored by us and which are reused, we have stated the origin of the code in each source file and in this thesis, we will use the terms {\it resued code} and {\it original code} to differentiate between the two.
+In order to clearly mark which parts of MeshDiff are authored by us and which are reused, we have stated the origin of the code in each source file and in this thesis, we will use the terms {\it reused code} and {\it original code} to differentiate between the two.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Triangle Mesh Viewing}
@@ -360,6 +360,8 @@ Apart from being able to pass the parameters to the \verb+DiffAlgo+ class in a c
 \footnotetext{Metric type is stored in a variable but there is a dedicated class called \verb+Metric+ in the program which handles metric computation and on top of that is also able to handle the input/output operations.}
 
 Each of the parameter classes implement individual parameters as properties and handle value checks. Exceptions thrown by these checks are not being caught, however, because the user interface is designed in such a way that invalid values cannot be assigned. Invalid assignments from code are then correctly detected and an exception is thrown in such cases.
+
+See Fig. \ref{fig:meshdiff-new_ui} for the modified user interface.
 %%-----------------------------------------------------------------------------------------
 \subsection{Visualization Infrastructure}
 \label{subsec:implementation-architecture-infrastructure}

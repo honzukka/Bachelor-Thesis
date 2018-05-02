@@ -182,6 +182,17 @@ MeshDiff is a graphical program running on Windows operating systems which allow
 
 As mentioned above, MeshDiff requires the input triangle meshes to be homologous. Homologization of two arbitrary triangle meshes can be done in publicly available software, for example in Morphome3cs \citep{Morpho}. The data we have used in the thesis was kindly provided to us by the Laboratory of 3D Imaging and Analytical Methods of the Faculty of Science at Charles University where it can be requested from.
 
+It is advisable that all input triangle meshes are connected, i.e. it is possible to get from any vertex \(v_1\) to any vertex \(v_2\) by traversing neighboring edges. If the input mesh is not connected, certain visualizations will only consider one connected component of the mesh.\footnotemark
+
+\footnotetext{These are visualizations where {\it signed clustering} is used. See section \ref{subsec:analysis-field_clustering-our_method} for details.}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{./img/meshdiff-new_ui.PNG}
+	\caption[MeshDiff - Main window]{MeshDiff - Main window}
+	\label{fig:meshdiff-new_ui}
+\end{figure}
+
 %%-----------------------------------------------------------------------------------------
 \subsection{How do I begin?}
 \label{attch:user_doc-begin}
@@ -358,7 +369,9 @@ Once the answer times are normalized, we need to compare them among different vi
 
 This implies that the normalized average times included in the tables are relative and therefore do not represent any standard units such as seconds or minutes.
 
-%The following page begins with the results of the first question.
-%\clearpage
+Each question is also accompanied by the answer we thought to be correct prior to the study and a visualization we expected to be the best for finding such an answer. We provide a brief commentary related to section \ref{sec:discussion-study_improvements} in cases where our expectations were not met.
+
+The following page begins with the results of the first question.
+\clearpage
 
 \input{study_results.tex}
