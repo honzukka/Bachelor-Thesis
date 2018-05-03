@@ -23,13 +23,13 @@ First, however, we will describe the internal representation of triangle meshes 
 \subsection{Triangle Mesh Representation}
 \label{subsec:implementation-algorithm-mesh_repre}
 
-We are using an implementation of triangle mesh boundary representation with a corner table which was presented in \citet{Corner03}. The implementation was written by Josef Pelikán. For brevity, we will refer to this representation as a {\it scene}.
+We are using an implementation of triangle mesh boundary representation with a~corner table which was presented in \citet{Corner03}. The implementation was written by Josef Pelikán. For brevity, we will refer to this representation as a {\it scene}.
 
 \begin{figure}[h]
 \centering
 \def\svgwidth{0.5\textwidth}
 \input{./illustrations/corner_table.pdf_tex}
-\caption[Corner Table Illustration]{An illustration of the corner table. The black corner has direct access to all red elements - its vertex and certain surrounding corners}
+\caption[Corner Table Illustration]{An illustration of the corner table. The black corner has direct access to all the red elements - its vertex and certain surrounding corners}
 \label{fig:illustration-corner_table}
 \end{figure}
 
@@ -43,9 +43,9 @@ We have added several methods to this implementation in order for us to be able 
 
 The core class of MeshDiff which encapsulates the visualization algorithm is called \verb+DiffAlgo+. \verb+DiffAlgo+ is initialized by the {\it rendered scene} and the {\it reference scene} and therefore only operates on these two specific {\it scenes} throughout its whole lifetime.
 
-The main public method of \verb+DiffAlgo+ is \verb+CreateVisualization()+. It is mainly responsible for metric computation and vector\footnotemark clustering. All this computed data is stored inside \verb+DiffAlgo+ instances. When the clustering is ready, a visualization is created and outputted from \verb+CreateVisualization()+ using a visualizer object.
+The main public method of \verb+DiffAlgo+ is \verb+CreateVisualization()+. It is mainly responsible for metric computation and vector\footnotemark clustering. All this computed data is stored inside \verb+DiffAlgo+ instances. When the clustering is ready, a~visualization is created and outputted from \verb+CreateVisualization()+ using a~visualizer object.
 
-\footnotetext{As mentioned in \ref{sec:analysis-input}, all our difference metrics can be represented by a vector.}
+\footnotetext{As mentioned in section \ref{sec:analysis-input}, all our difference metrics can be represented by a vector.}
 
 The fact that all intermediate results are stored inside a \verb+DiffAlgo+ instance means that when \verb+CreateVisualization()+ is called again, data which is difficult to compute, especially the vector clustering, can be reused if possible.
 
@@ -63,7 +63,7 @@ The C\#-styled\footnotemark pseudocode below describes the visualization workflo
 \Statex \Comment Difference metric computation
 \If{required metric values not available}
 	\State arrows = GetArrows(renderedScene, refScene, metricType);
-    \State clusteringObject = ClusteringFactory(arrows, sceneP);
+    \State clusteringObject = ClusteringFactory(arrows, renderedScene);
     \State currentMetricType = metricType;
 \EndIf
 \Statex \Comment Vector clustering
@@ -80,9 +80,9 @@ The C\#-styled\footnotemark pseudocode below describes the visualization workflo
 \subsection{Difference Metric Computation}
 \label{subsec:implementation-algorithm-metrics}
 
-In order to compute a difference metric, this part of the workflow requires the type of the metric it should compute and also both {\it scenes}. The former is passed in as an argument of \verb+CreateVisualization()+ and the latter are stored inside \verb+DiffAlgo+.
+In order to compute a difference metric, this part of the workflow requires the type of the metric it should compute and also both {\it scenes}. The former is passed in as an argument of \verb+CreateVisualization()+ and the latter two are stored inside \verb+DiffAlgo+.
 
-As mentioned earlier, we have included two difference metrics in MeshDiff, both of which can be represented by a 3D vector:
+As mentioned in section \ref{sec:analysis-input}, we have included two difference metrics in the MeshDiff application, both of which can be represented by a 3D vector:
 
 \begin{itemize}
 \item Corresponding vertex distance
@@ -97,7 +97,7 @@ Here are the most important fields of \verb+Arrow+:
 \item \verb+Origin+ - the position of the vector metric, initially coinciding with a {\it scene} vertex (this can change during the clustering process)
 \item \verb+Direction+ - a 3D vector representing the metric itself
 \item \verb+Orientation+ - tells whether the arrow points {\it inwards} or {\it outwards}
-\item \verb+VertexHandle+ - if \verb+Origin+ coincides with a {\it scene} vertex, this is its index in the {\it scene} representation, otherwise it is -1
+\item \verb+VertexHandle+ - if \verb+Origin+ coincides with a {\it scene} vertex, this is its index in the {\it scene} representation, otherwise it is \(-1\)
 \end{itemize}
 
 If the required metric type is equal to the current metric type stored in \verb+DiffAlgo+, old data is reused and this step is skipped, otherwise all corresponding vertices of both {\it scenes} are enumerated and for each pair, the configured metric is computed on the {\it rendered scene} and relative to the {\it reference scene}. For example, in the case of corresponding vertex distance, consider a {\it rendered scene} \(S_p\), a {\it reference scene} \(S_r\), vertices (vectors) \(\overrightarrow{v} \in S_p, \overrightarrow{w} \in S_r\) and a difference metric vector \(\overrightarrow{m}\). Then \(\overrightarrow{m_{vw}} = w - v\). Therefore, \(m_{vw}\) behaves as shown in Fig. \ref{fig:illustration-problem_input}.
@@ -124,7 +124,7 @@ Overall, there are three clustering types in MeshDiff:
 
 The clustering type used in \verb+DiffAlgo+ is determined by a factory method passed to its constructor. A \verb+DiffAlgo+ instance can therefore create and use the clustering object without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings of multiple types can be saved simultaneously (in different \verb+DiffAlgo+ instances) and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be generated, thanks to the dendrogram (see Fig. \ref{fig:illustration-telea_hierarchical_clustering}) which contains all clusterings of 1 to \(n\) clusters where \(n\) is the number of original arrows. When a reuse is impossible, a new clustering object is created using the factory method. Another reason why this encapsulation approach was chosen is that dendrograms should be stored in the clustering objects and not in the \verb+DiffAlgo+ instances in order for the implementation details to stay hidden from \verb+DiffAlgo+.
 
-We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process and whose instances form nodes of the dendrogram. \verb+Cluster+ instances are able to merge with other \verb+Cluster+ instances and compute the clustering error given another \verb+Cluster+ instance. They also contain all the information needed for the visualization to be created. Here are the most important fields of \verb+Cluster+:
+We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process and whose instances form nodes of~the dendrogram. \verb+Cluster+ instances are able to compute the error function (see equation~\ref{eq:clustering_error}) given another \verb+Cluster+ instance and also to perform the merge. They contain all the information needed for the visualization to be created. Here are the most important fields of \verb+Cluster+:
 
 \begin{itemize}
 \item \verb+Neighbors+ - a set of \verb+Cluster+ instances adjacent to the cluster
@@ -192,7 +192,7 @@ The condition on line 6 of algorithm \ref{algo:cluster_extract-forest} is fulfil
 
 Line 12 of algorithm \ref{algo:cluster_extract-forest} ensures that clusters which were chosen only because they are roots (line 2) and not because their level is high enough are excluded from the selection. This is necessary to return the cluster count requested but at the same time it introduces the limitation we discussed in section \ref{subsec:analysis-field_clustering-our_method} which is that for certain cluster counts, the returned clusters do not cover the whole {\it scene}.
 
-If the desired clustering is not available (i.e. the corresponding dendrogram is not built), the clustering object performs the clustering algorithm. Here is the outline of it (largely similar to \citet{Telea99}):
+If the desired clustering is not available (i.e. the corresponding dendrogram is not built), the clustering object performs the clustering algorithm. Here is the outline of {\it simple clustering} (largely similar to \citet{Telea99}):
 
 \begin{algorithm}[H]
 \caption{Clustering}
@@ -201,16 +201,16 @@ If the desired clustering is not available (i.e. the corresponding dendrogram is
 
 \Require arrows, MinHeap clusteringCandidates \Comment clusteringCandidates are ordered by clustering error
 \Statex
-\For{each arrow\textsubscript{i} \textbf{in} arrows}
+\For{arrow\textsubscript{i} \textbf{in} arrows}
 	\State initialCluster = makeCluster(arrow\textsubscript{i});
-    \State set level of intialCluster to 0;
-    \State add initialCluster to initialClusters;
+    \State initialCluster.Level = 0;
+    \State initialClusters.Add(initialCluster);
 \EndFor
 \Statex
-\For{each cluster\textsubscript{i} in initialClusters}
-	\For{each cluster\textsubscript{j} neighbour of cluster\textsubscript{i}}
+\For{cluster\textsubscript{i} \textbf{in} initialClusters}
+	\For{cluster\textsubscript{j} \textbf{in} cluster\textsubscript{i}.Neighbors}
     	\State e = clusteringError(cluster\textsubscript{i}, cluster\textsubscript{j});
-        \State insert (cluster\textsubscript{i}, cluster\textsubscript{j}) into clusteringCandidates
+        \State clusteringCandidates.Insert((cluster\textsubscript{i}, cluster\textsubscript{j}))
         \State mark cluster\textsubscript{i} and cluster\textsubscript{j} as NOT\_CLUSTERED;
     \EndFor
 \EndFor
@@ -219,24 +219,25 @@ If the desired clustering is not available (i.e. the corresponding dendrogram is
 \While{clusteringCandidates.Count > 0}
 	\State (cluster\textsubscript{i}, cluster\textsubscript{j}) = clusteringCandidates.ExtractMin();
     \If{cluster\textsubscript{i} and cluster\textsubscript{j} are both NOT\_CLUSTERED}
+    	\State level++;
     	\State newCluster = mergeClusters(cluster\textsubscript{i}, cluster\textsubscript{j});
-        \State set level of newCluster to level++;
+        \State newCluster.Level = level;
 		\State mark newCluster as NOT\_CLUSTERED;
         \State mark cluster\textsubscript{i} and cluster\textsubscript{j} as CLUSTERED;
-        \For{each cluster neighbour of newCluster}
+        \For{cluster\textsubscript{k} \textbf{in} newCluster.Neighbors}
         	\State e = clusteringError(cluster, newCluster);
-            \State insert (cluster, newCluster) into clusteringCandidates
+            \State clusteringCandidates.Insert((cluster, newCluster));
         \EndFor
     \EndIf
 \EndWhile
 \Statex
-\Return c as root of tree
+\Return newCluster as the root of the dendrogram
 \end{algorithmic}
 \end{algorithm}
 
-\verb+mergeClusters()+ and \verb+clusteringError+ are implemented in accordance with section \ref{subsec:analysis-field_clustering-our_method}. We will now mention the most important implementation details of \verb+mergeClusters()+.
+\verb+mergeClusters()+ and \verb+clusteringError()+ are implemented in accordance with section \ref{subsec:analysis-field_clustering-our_method}. We will now mention the most important implementation details of \verb+mergeClusters()+.
 
-First of all, when a new cluster is created, it needs to be placed in the clustering space by modifying all neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. The orientation of the new representative arrow is either inherited ({\it signed clustering}) or estimated based on the dominant orientation among the \verb+PrimaryArrows+ of the new cluster. New mesh resolution is obtained by averaging the resolutions of the two original clusters. Lastly, the size of the new cluster is computed directly when the cluster is sufficiently small, otherwise it is determined by the sum of the sizes of the original clusters.
+First of all, when a new cluster is created, it needs to be placed in the clustering space. This is done by modifying all the neighboring clusters of its two children to be the neighbors of the new cluster instead, except for the children themselves. Also, the neighboring relation has to be made symmetrical by updating the neighbor lists of the surrounding clusters. The orientation of the new representative arrow is either inherited ({\it signed clustering}) or estimated based on the dominant orientation among the \verb+PrimaryArrows+ of the new cluster ({\it simple clustering}). New mesh resolution is obtained by averaging the resolutions of the two original clusters. Lastly, the size of the new cluster is computed directly when the cluster is sufficiently small, otherwise it is determined by the sum of the sizes of the original clusters.
 
 \subsubsection{Output}
 
@@ -265,7 +266,7 @@ We will now focus on two main types of visualizers - arrow visualizers and color
 
 \subsubsection{Arrow Visualizers}
 
-Arrow visualizer objects only have one field which is initialized in the constructor. This field holds a basic {\it scene} representing a 3D arrow. The triangle mesh of this arrow was created manually in order to have the least amount of vertices and triangles possible to reduce the overall amount of data. It has 17 vertices and 16 triangles. The tip of the arrow is an eight-sided pyramid which was found to have much better appearance than the basic four-sided pyramid and this justified the slightly larger vertex count.
+Arrow visualizer objects only have one field which is initialized in the constructor. This field holds a basic {\it scene} representing a 3D arrow. The triangle mesh of this arrow was created manually in order to have the least amount of vertices and triangles possible to reduce the overall amount of data. It has 17~vertices and 16~triangles. The tip of the arrow is an eight-sided pyramid which was found to have much better appearance than the basic four-sided pyramid and this justified the slightly larger vertex count.
 
 \begin{figure}[h]
 \centering
@@ -280,33 +281,33 @@ Arrow visualizer objects only have one field which is initialized in the constru
     \caption{Eight-sided tip version (used)}
     \label{fig:meshdiff-8sided_arrow}
 	\end{subfigure}
-\caption[Wireframe models used for arrow visualizations]{Wireframe models used for arrow visualizations}
+\caption[Wireframe models considered for arrow visualizations]{Wireframe models considered for arrow visualizations}
 \end{figure}
 
 The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{subsec:analysis-visualizations-arrows} and on the visualization parameters supplied. Colors are assigned to the arrow {\it scenes} depending on whether the representative vector points {\it inwards} or {\it outwards} (see attachment \ref{attch:parameter_desc-visualization_parameters}). All created arrow {\it scenes} are then copied into the output {\it scene} supplied.
 
-The inverted visualization is obtained by multiplying the representative vector by -1 and assigning the arrow {\it scene} colors based on this version of the vector.
+The inverted visualization is obtained by multiplying the representative vector by \(-1\) and assigning the arrow {\it scene} colors based on this version of the vector.
 
 \subsubsection{Color Visualizers}
 
-For each color visualization type mentioned in section \ref{sec:analysis-visualizations} there is a separate visualizer class. These classes determine how color is assigned to vertices. In general, each visualizer loops though all \verb+Cluster+ instances supplied and for each of them it generates a color based on the metric value for that cluster. Clusters which passed through thresholding receive a color based on the length of the representative vector and its orientation (see attachment \ref{attch:parameter_desc-visualization_parameters}). Once a color is created, it is inserted into a list at precisely those indices which belong to the \verb+PrimaryArrows+ (see section \ref{subsec:implementation-algorithm-clustering}) of the associated cluster. It is important to respect this indexing in order to make the mapping of the colors to the {\it scene} vertices easier. The colors are then applied to the vertices of the output {\it scene} supplied\footnotemark.
+For each color visualization type mentioned in section \ref{sec:analysis-visualizations} there is a separate visualizer object. These objects determine how color is assigned to vertices. In~general, each visualizer loops though all \verb+Cluster+ instances supplied and for each of~them it generates a color based its metric value. Clusters which passed through thresholding receive a color based on the length of the representative vector and its orientation (see attachment \ref{attch:parameter_desc-visualization_parameters}). Once a color is created, it is inserted into a list at precisely those indices which belong to the \verb+PrimaryArrows+ (see section~\ref{subsec:implementation-algorithm-clustering}) of the associated cluster. It is important to respect this indexing in order to make the mapping of the colors to the {\it scene} vertices easier. The colors are then applied to the vertices of the output {\it scene} supplied\footnotemark.
 
-The inverted visualization is also obtained by multiplying the representative vector by -1 and generating the colors based on this version of the vector.
+The inverted visualization is also obtained by multiplying the representative vector by \(-1\) and generating the colors based on this version of the vector.
 
 \footnotetext{It is worth mentioning that when the clusters supplied to this visualizer correspond to the original vectors (i.e. no clustering was performed), a per-vertex visualization is generated similar to those in MeshLab or Morphome3cs (see the introduction).}
 
 \subsubsection{Output}
 
-The generated visualization is baked into the first supplied output {\it scene} and an inverted visualization is baked into the second supplied {\it scene}.
+The generated visualization is baked into the first supplied output {\it scene} and an inverted visualization is baked into the second supplied output {\it scene}.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
 \section{MeshDiff Architecture}
 \label{sec:implementation-architecture}
 
-Similarly to MeshLab or Morphome3cs, in MeshDiff, the core functionality is the ability to load and store triangle meshes and to view them interactively using the mouse cursor. Because this functionality is present in almost all programs which work with triangle meshes and at the same time it is non-trivial, we reused available code which provides it, more specifically we built MeshDiff on top of a mesh viewer application written by Josef Pelikán.
+Similarly to MeshLab\footnote{\citet{MeshLab}} and Morphome3cs\footnote{\citet{Morpho}}, in MeshDiff, the core functionality is the ability to load and store triangle meshes and to view them interactively using the mouse cursor. Because this functionality is present in almost all programs which work with triangle meshes and at the same time it is non-trivial, we reused available code which provides it, more specifically we built MeshDiff on top of~a~mesh viewer application written by Josef Pelikán.
 
-In this chapter, we will mention the platform MeshDiff is built on and intended for, then we will talk about the features we added to the reused mesh viewer and the changes we made to the user interface to support of visualization rendering purposes. At the end, we will reveal how the visualization workflow is incorporated into MeshDiff.
+In this chapter, we will mention the platform MeshDiff is built on and intended for and we will talk about the features we added to the reused mesh viewer and the changes we made to the user interface to support of visualization rendering purposes. At the end, we will reveal how the visualization workflow is incorporated into MeshDiff.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{Platform}
@@ -327,21 +328,21 @@ Interactivity is handled by a class called \verb+Trackball+ which intercepts mou
 We have added several modifications to this basic setup to support the rendering of visualizations of the difference between two triangle meshes. Here are the most significant ones:
 
 \begin{itemize}
-\item We have added a second viewing panel for the inverted visualization on the {\it reference mesh} (see section \ref{subsec:implementation-algorithm-visualization}). This required duplicating the buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
+\item We have added a second viewing panel for the inverted visualization on the {\it reference mesh} (see section \ref{subsec:implementation-algorithm-visualization}). This required duplicating buffer objects, \verb+Trackball+ instances and also fields which stored the loaded {\it scenes}.
 \item Based on that we have added the option to either control both views separately, or to control both of them at the same time. This is done by first modifying the \verb+Trackball+ instance according to the mouse event associated with the view panel in was intended for and then copying the resulting rotation matrix from that instance to the second instance. Because the coordinates in the mouse events are tied to their view panels, simply routing the events to the second view panel would only work if both panels had the same dimensions. This solution is more general and bypasses coordinate recalculation.
-\item When visualizations are to be created, the visualizer objects (see section \ref{subsec:implementation-algorithm-visualization}) are supplied with copies of the raw {\it scenes} to bake the visualizations to. These visualization {\it scenes} are then stored alongside the raw scene. This allows users to quickly switch between viewing visualizations and raw {\it scenes}. When a new visualization is requested, another pair of copies is be made out of the raw {\it scenes} and when the visualization is baked, it replaced the old visualization pair.
-\item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once was added to the rendering methods. In the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{subsec:implementation-algorithm-visualization}).
+\item When visualizations are to be created, the visualizer objects are supplied with copies of the raw {\it scenes} to bake the visualizations to (see section~\ref{subsec:implementation-algorithm-visualization}). These visualization {\it scenes} are then stored alongside the raw scene. This allows users to quickly switch between viewing visualizations and raw {\it scenes}. When a new visualization is requested, another pair of copies is be made out of the raw {\it scenes} and when the visualization is baked, it replaced the old visualization pair.
+\item For the case when arrows are part of a visualization, we have added the option to toggle wireframe view independently for them and the underlying {\it scene}. The arrows therefore need to be stored in a separate {\it scene} and the option to render two {\it scenes} at once was added to the rendering methods. In~the visualization process, this is achieved by baking the color visualization into the underlying {\it scene} and the arrow visualization into an empty {\it scene} (see section \ref{subsec:implementation-algorithm-visualization}).
 \end{itemize}
 
 \begin{figure}[h]
 	\centering
 	\def\svgwidth{\textwidth}
 	\input{./illustrations/scenes_explained.pdf_tex}
-	\caption[Scenes Explained]{An illustration of the two view panels of MeshDiff and various scenes which can be displayed in them.}
+	\caption[Scenes Explained]{An illustration of the two view panels of MeshDiff and various scenes which can be displayed in them}
 	\label{fig:illustration-scenes_explained}
 \end{figure}
 
-To summarize, next to the pair of raw {\it scenes} we also store four additional {\it scenes}: one pair for the raw {\it scenes} with color visualizations and one pair only for arrows. See Fig. \ref{fig:illustration-scenes_explained} for an illustration of this.
+To summarize, next to the pair of raw {\it scenes} we also store four additional {\it scenes}: one pair of raw {\it scenes} with a color visualization and one pair of arrow {\it scenes}. See Fig. \ref{fig:illustration-scenes_explained} for an illustration of this.
 
 %%-----------------------------------------------------------------------------------------
 \subsection{User Interface}
@@ -351,11 +352,11 @@ We have extended the {\it reused} user interface by adding functionality which a
 
 We have decided to duplicate clustering parameters and have a separate set for clustering in color visualizations and arrow visualizations. This makes MeshDiff more flexible because if there was only one set, it would not be possible to visualize using unclustered color and clustered arrows at the same time.
 
-The most important clustering and visualization parameters can be modified directly from the main form where both triangle meshes can be viewed interactively as well. Metric type and all other parameters have their separate dialog windows.
+The most important clustering and visualization parameters can be modified directly from the main form where both triangle meshes can be interactively viewed as well. Metric type and all other parameters have their separate dialog windows.
 
-There are four places in the code where this configuration is held. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a single variable. Clustering parameters have their own dedicated class and so do the visualization parameters which control the appearance of the visualizations.
+There are four places in the code where this configuration is held. The \verb+Trackball+ class remembers the model matrix and zoom value for each of the displayed triangle meshes. Currently chosen difference metric type is stored in a~single variable. Clustering parameters have their own dedicated objects and so do the visualization parameters which control the appearance of the visualizations.
 
-Apart from being able to pass the parameters to the \verb+DiffAlgo+ class in a compact way, this approach also has the advantage that each class encapsulating a certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark.
+Apart from being able to pass the parameters to the \verb+DiffAlgo+ class in a~compact way, this approach also has the advantage that each class encapsulating a~certain group of parameters is also able to write them to a file and it is also able to initialize itself from a file\footnotemark.
 
 \footnotetext{Metric type is stored in a variable but there is a dedicated class called \verb+Metric+ in the program which handles metric computation and on top of that is also able to handle the input/output operations.}
 
