@@ -3,6 +3,25 @@
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
+\section{Electronic Attachment}
+\label{attch:electronic}
+
+This is the structure of the electronic attachment of this thesis:
+
+\begin{itemize}
+	\item \verb+doc/+ - contains this document in a PDF
+	\item \verb+MeshDiff/+ - contains the binaries of MeshDiff
+	\item \verb+src/+ - contains the complete source code of MeshDiff and the study program
+	\item \verb+study/+ - contains the user study as distributed to participants
+\end{itemize}
+
+We do not enclose any test data. This data is available at request from RNDr.~Josef~Pelikán or from the Laboratory of 3D Imaging and Analytical Methods of the Faculty of Science at Charles University.
+
+\clearpage
+
+%%-----------------------------------------------------------------------------------------
+%% SECTION
+%%-----------------------------------------------------------------------------------------
 \section{Parameter Description}
 \label{attch:parameter_description}
 
@@ -173,6 +192,8 @@ The rest of the parameters comprise the viewing angle and zoom of both {\it scen
 	\end{itemize}
 \end{itemize}
 
+\clearpage
+
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
@@ -252,6 +273,7 @@ We have written \verb+ParameterWriter+ and \verb+ParameterReader+ classes which 
 
 \verb+ParameterWriter+ is initialized in a similar manner and provides two methods: \verb+WritePair()+ and \verb+WriteEmptyLine()+. Both methods write to the given file and they always append to file. Upon the first call, a section of the given name is created and all subsequent calls write key/value pairs under that section. \verb+WritePair()+ can only accept arguments of type \verb+string+. This class also implements the \verb+IDisposable+ interface.
 
+\clearpage
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
@@ -450,6 +472,8 @@ Click \verb+File > Save Parameters+ and the complete configuration of MeshDiff i
 \label{attch:user_doc-load_config}
 
 Click \verb+File > Load Parameters+ and choose the desired \verb+.ini+ file. In order to utilize the configuration, triangle meshes have to be loaded separately.
+
+\clearpage
 
 %%-----------------------------------------------------------------------------------------
 %% SECTION
