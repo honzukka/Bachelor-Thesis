@@ -1,6 +1,6 @@
 # Visualization of the difference between two triangle meshes
 
-This repository contains LaTeX source files as well as the final PDF of my bachelor's thesis written at the Faculty of Mathematics and Physics of Charles University in Prague under the supervision of RNDr. Josef Pelikán.
+This repository contains LaTeX source files as well as the final PDF of my bachelor's thesis written in 2018 at Charles University in Prague under the supervision of RNDr. Josef Pelikán.
 
 ## Abstract
 
