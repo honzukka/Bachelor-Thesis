@@ -9,7 +9,7 @@ In this chapter, we will introduce the user study and describe how it was conduc
 \section{Setting}
 \label{sec:user_study-setting}
 
-The goal of our study was to simulate use cases of both new and existing visualizations of the corresponding vertex distance metric and assess their performance in those use cases. Other difference metrics are out of scope of this thesis. Our general approach was to choose a pair of triangle meshes, find a specific difference between them and then generate several visualizations which would then help the user find the same difference. This corresponds to the situation where a certain difference metric is computed and needs to be presented in a clear way. In some cases, we asked a question we did not know the answer to. This corresponds to the situation where visualizations directly help users devise a result. Good visualizations therefore had to either help the participant answer correctly or create a~clear agreement among the majority of participants.
+The goal of our study was to simulate use cases of both new and existing visualizations of the corresponding vertex distance metric and assess their performance in those use cases. Other difference metrics are out of scope of this thesis. Our~general approach was to choose a pair of triangle meshes, find a specific difference between them and then generate several visualizations which would then help the user find the same difference. This corresponds to the situation where a certain difference metric is computed and needs to be presented in a clear way. In some cases, we asked a question we did not know the answer to. This corresponds to the situation where visualizations directly help users devise a result. Good visualizations therefore had to either help the participant answer correctly or create a~clear agreement among the majority of participants.
 
 We have prepared 10 questions, each of them tied to a specific pair of triangle meshes and a specific difference between them. Each question was accompanied by four different visualizations. We have split all the visualizations into four groups of ten such that each group contained one visualization for each question. Participants were assigned to one of the groups randomly at the beginning of the study and answered the questions with the help of visualizations from their group (see Fig.~\ref{fig:illustration-study_setting} for the schema of the study). At the end, we have compared the answers to each question among the four visualization groups.
 
@@ -53,9 +53,9 @@ We have created the following types of questions based on the way they can be an
 
 \begin{description}
 \item [Left/Right] In these questions, participants were supposed to answer by clicking on one of the meshes.
-\item [Yes/No] In these questions, participants were supposed to answer by choosing either ``Yes'' or ``No'' from a dropdown menu.
-\item [Direction] In these questions, a specific direction selected from a dropdown menu was accepted as an answer.
-\item [Location] In these questions, participants answered by choosing one of six predefined locations in a mesh from a dropdown menu.
+\item [Yes/No] In these questions, participants were supposed to answer by choosing either ``Yes'' or ``No'' from a drop-down menu.
+\item [Direction] In these questions, a specific direction selected from a drop-down menu was accepted as an answer.
+\item [Location] In these questions, participants answered by choosing one of six predefined locations in a mesh from a drop-down menu.
 \end{description}
 
 Each question type also provided the possibility to answer ``Not sure'' when the participant did not understand the question or if the question was too difficult for them.
@@ -64,7 +64,7 @@ Each question type also provided the possibility to answer ``Not sure'' when the
 \subsection{Program}
 \label{subsec:user_study-setting-program}
 
-We have modified MeshDiff for the purposes of the study. The only features which remained were the ability to load and interactively view pre-generated visualizations and to modify the view by toggles described in attachment \ref{attch:user_doc-view_control}. We have added a tutorial at the beginning which gives the full instructions to the participant, therefore no prior knowledge of the program nor the subject of~the study is required. The tutorial also lets the participant answer one sample question. 
+We have modified MeshDiff for the purposes of the study. The only features which remained were the ability to load and interactively view pregenerated visualizations and to modify the view by toggles described in attachment \ref{attch:user_doc-view_control}. We have added a tutorial at the beginning which gives the full instructions to the participant, therefore no prior knowledge of the program nor the subject of~the study is required. The tutorial also lets the participant answer one sample question. 
 
 We will now describe the course of one session of the study. At the beginning, the participant completes the tutorial. The program then provides feedback to the sample answer and explains why it was correct or incorrect. After that, 10~other questions are presented. Each of them begins with a description of~the visualization currently being shown. When the participant agrees they have understood the description, the program starts to secretly measure time. When the answer is chosen and confirmed, the time elapsed is saved along with the value of the provided answer and the next question is presented.
 

@@ -124,7 +124,7 @@ Overall, there are three clustering types in MeshDiff:
 
 The clustering type used in \verb+DiffAlgo+ is determined by a factory method passed to its constructor. A \verb+DiffAlgo+ instance can therefore create and use the clustering object without knowing its type and at the same time it is limited to using only one clustering type. Thanks to this, computed clusterings of multiple types can be saved simultaneously (in different \verb+DiffAlgo+ instances) and reused if needed. It is important to note that this reuse happens every time the user chooses to view a new visualization which differs from the previous one only in the number of clusters to be generated, thanks to the dendrogram (see Fig. \ref{fig:illustration-telea_hierarchical_clustering}) which contains all clusterings of 1 to \(n\) clusters where \(n\) is the number of original arrows. When a reuse is impossible, a new clustering object is created using the factory method. Another reason why this encapsulation approach was chosen is that dendrograms should be stored in the clustering objects and not in the \verb+DiffAlgo+ instances in order for the implementation details to stay hidden from \verb+DiffAlgo+.
 
-We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process and whose instances form nodes of~the dendrogram. \verb+Cluster+ instances are able to compute the error function (see equation~\ref{eq:clustering_error}) given another \verb+Cluster+ instance and also to perform the merge. They contain all the information needed for the visualization to be created. Here are the most important fields of \verb+Cluster+:
+We will now introduce a new class called \verb+Cluster+ which \verb+Arrow+ instances are converted to in the clustering process and whose instances form nodes of~the dendrogram. \verb+Cluster+ instances are able to compute the error function (see equation~\ref{eq:clustering_error}) given another \verb+Cluster+ instance and also to perform the merge. They~contain all the information needed for the visualization to be created. Here~are the most important fields of \verb+Cluster+:
 
 \begin{itemize}
 \item \verb+Neighbors+ - a set of \verb+Cluster+ instances adjacent to the cluster
@@ -251,7 +251,7 @@ When the visualization itself is to be generated from the list of \verb+Cluster+
 
 In section \ref{sec:analysis-visualizations}, we have proposed several types of visualizations. Each of them has an associated visualizer object which generates it based on \verb+Cluster+ instances supplied to it. It is useful to compare these objects with clustering objects described in section \ref{subsec:implementation-algorithm-clustering} because both are utilized differently in \verb+DiffAlgo+.
 
-Clustering objects are designed to store dendrograms for potential later reuse because their computation is time-consuming and a reuse is likely. Visualizer objects, on the other hand, do not store any state or intermediate results because visualizations are fast to compute and reuses are not very helpful because outputting a visualization requires similar time as creating it. They can therefore be passed to \verb+CreateVisualization()+ from the outside and used only to directly output visualizations.
+Clustering objects are designed to store dendrograms for potential later reuse because their computation is time-consuming and a reuse is likely. Visualizer~objects, on the other hand, do not store any state or intermediate results because visualizations are fast to compute and reuses are not very helpful because outputting a visualization requires similar time as creating it. They can therefore be passed to \verb+CreateVisualization()+ from the outside and used only to directly output visualizations.
 
 All visualizer objects have two public methods, one is intended for visualizations for the {\it rendered scene} and the other is intended for visualizations for the {\it reference scene}. The latter is obtained by inverting the former. See Fig. \ref{fig:illustration-problem_input} for an illustration of the situation. Creating visualizations for both of the compared scenes allows for both of them to be displayed next to each other which enhances the effect of the visualizations. See Fig.\ref{fig:meshdiff-inverted_vis}.
 
@@ -284,7 +284,7 @@ Arrow visualizer objects only have one field which is initialized in the constru
 \caption[Wireframe models considered for arrow visualizations]{Wireframe models considered for arrow visualizations}
 \end{figure}
 
-The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{subsec:analysis-visualizations-arrows} and on the visualization parameters supplied. Colors are assigned to the arrow {\it scenes} depending on whether the representative vector points {\it inwards} or {\it outwards} (see attachment \ref{attch:parameter_desc-visualization_parameters}). All created arrow {\it scenes} are then copied into the output {\it scene} supplied.
+The visualizer receives a list of clusters as input, loops through those which passed through thresholding and makes a scaled copy of the basic arrow in each iteration. The scale of the copy is based on the representative vector of the cluster as described in section \ref{subsec:analysis-visualizations-arrows} and on the visualization parameters supplied. Colors~are assigned to the arrow {\it scenes} depending on whether the representative vector points {\it inwards} or {\it outwards} (see attachment \ref{attch:parameter_desc-visualization_parameters}). All created arrow {\it scenes} are then copied into the output {\it scene} supplied.
 
 The inverted visualization is obtained by multiplying the representative vector by \(-1\) and assigning the arrow {\it scene} colors based on this version of the vector.
 
@@ -298,7 +298,7 @@ The inverted visualization is also obtained by multiplying the representative ve
 
 \subsubsection{Output}
 
-The generated visualization is baked into the first supplied output {\it scene} and an inverted visualization is baked into the second supplied output {\it scene}.
+The generated visualization is baked into the first supplied output {\it scene} and an~inverted visualization is baked into the second supplied output {\it scene}.
 %%-----------------------------------------------------------------------------------------
 %% SECTION
 %%-----------------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ In order to clearly mark which parts of MeshDiff are authored by us and which ar
 \subsection{Triangle Mesh Viewing}
 \label{subsec:implementation-architecture-mesh_viewing}
 
-The {\it reused code} of MeshDiff supports two standard triangle mesh formats, \verb+.obj+ and \verb+.ply+. It is able to load and store files in these formats and also convert between them and the internal {\it scene representation} (see section \ref{subsec:implementation-algorithm-mesh_repre}) of a triangle mesh. The {\it scene} can be prepared for rendering by storing its data in the vertex buffer object in the GPU. This is accomplished by calling one of the {\it scene's} own methods. In each frame, a rendering method is called which comprises OpenTK calls tied to a view panel showing the triangle mesh. The view panel is a custom OpenTK control placed directly in the main form of the application. This process can be configured by a set of toggles which can change the viewing mode to wireframe, enable shading, etc.
+The {\it reused code} of MeshDiff supports two standard triangle mesh formats: \verb+.obj+\footnote{\label{foot:obj}Wavefront .obj file format. Not to be confused with object files used in compilers.} and \verb+.ply+\footnote{\label{foot:ply}Polygon File Format.}. It is able to load and store files in these formats and also convert between them and the internal {\it scene representation} (see section \ref{subsec:implementation-algorithm-mesh_repre}) of a triangle mesh. The {\it scene} can be prepared for rendering by storing its data in the vertex buffer object in the GPU. This is accomplished by calling one of the {\it scene's} own methods. In each frame, a rendering method is called which comprises OpenTK calls tied to a view panel showing the triangle mesh. The view panel is a custom OpenTK control placed directly in the main form of the application. This process can be configured by a set of toggles which can change the viewing mode to wireframe, enable shading, etc.
 
 Interactivity is handled by a class called \verb+Trackball+ which intercepts mouse events from the view panel and modifies the model matrix used in the rendering process.
 

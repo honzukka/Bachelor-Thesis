@@ -17,7 +17,7 @@ This is the structure of the electronic attachment of this thesis:
 
 We do not enclose any test data. This data is available at request from RNDr.~Josef~Pelikán or from the Laboratory of 3D Imaging and Analytical Methods of the Faculty of Science at Charles University.
 
-The repository of the MeshDiff application is hosted on GitHub: 
+The code and the binaries of MeshDiff can also be found in the following GitHub repository: 
 \begin{itemize}
 	\item \url{https://github.com/honzukka/MeshDiff.git}
 \end{itemize}
@@ -115,6 +115,8 @@ As mentioned in section \ref{subsec:implementation-architecture-infrastructure},
 		\item Determines the color of arrows pointing {\it inwards} (see section \ref{sec:analysis-input}).
 		\item Valid values: Any RGB color
 	\end{itemize}
+
+\clearpage
 
 \item {\bf Color Metric Outwards}
 	\begin{itemize}
@@ -294,14 +296,12 @@ For clarity, each section of this chapter represents an answer to a question the
 \subsection{About MeshDiff}
 \label{attch:user_doc-about}
 
-MeshDiff is a graphical program running on Windows operating systems which allows its users to interactively view two homologous triangle meshes\footnotemark in \verb+.ply+ or \verb+.obj+ format and visualize the difference between them. MeshDiff has various color-based, arrow-based and combined visualizations available. Once the user has found a visualization which suits their intentions the best, there are two options of saving the visualization:
+MeshDiff is a graphical program running on Windows operating systems which allows its users to interactively view two homologous triangle meshes\footnote{See footnotes \ref{foot:triangle_mesh} and \ref{foot:homologous}.} in \verb+.ply+\footnote{See footnote \ref{foot:ply}} or \verb+.obj+\footnote{See footnote \ref{foot:obj}} format and visualize the difference between them. MeshDiff has various color-based, arrow-based and combined visualizations available. Once the user has found a visualization which suits their intentions the best, there are two options of saving the visualization:
 
 \begin{itemize}
 \item It can be exported as a \verb+.ply+ file and subsequently loaded in any \verb+.ply+ viewer, for example in a mobile application called MorphoView and  presented in \citet{Pikora}
 \item Its configuration can be saved. In this case, MeshDiff can load the configuration and generate the very same visualization under the very same viewing angle later
 \end{itemize}
-
-\footnotetext{See footnotes \ref{foot:triangle_mesh} and \ref{foot:homologous}.}
 
 %%-----------------------------------------------------------------------------------------
 \subsection{How do I obtain the correct input data?}
@@ -353,7 +353,7 @@ There are other toggles in the \verb+View+ menu, all of which modify the view in
 \item [Ambient] When shaders are enabled, this option adds ambient light. Ambient light is a sourceless light illuminating all parts of the mesh uniformly. In~reality, this roughly corresponds to light which has been reflected many times and therefore illuminates even surfaces which are not facing a light source 
 \item [Diffuse] When shaders are enabled, this option adds diffuse reflections. Diffuse reflections occur in objects with a rough surface where light is reflected in many unpredictable directions
 \item [Specular] When shaders are enabled, this option adds specular reflections. Specular reflections occur in polished objects with a prevalent direction of reflected light. They make the object look shiny
-\item [Phong] When shaders are enabled, this option toggles Phong shading. This is an alternative shading algorithm which tries to hide the edges between triangles
+\item [Phong] When shaders are enabled, this option toggles Phong shading. This~is an alternative shading algorithm which tries to hide the edges between triangles
 \end{description}
 
 %%-----------------------------------------------------------------------------------------
@@ -362,7 +362,7 @@ There are other toggles in the \verb+View+ menu, all of which modify the view in
 
 Once you have loaded both triangle meshes and set the view according to your taste, you can create a visualization of the difference between the two meshes. Please, see chapter \ref{chap:analysis} for a thorough analysis of all the visualization that MeshDiff supports.
 
-Basic configuration of a visualization can be done in the main window of MeshDiff (see Fig. \ref{fig:meshdiff-creating_visualization}). The \verb+Arrow Visualization+ and \verb+Color Visualization+ dropdowns allow you to choose specific types of both visualizations. You can disable either of them by choosing \verb+No+ and \verb+None+ respectively, but it is also possible to combine them together.
+Basic configuration of a visualization can be done in the main window of MeshDiff (see Fig. \ref{fig:meshdiff-creating_visualization}). The \verb+Arrow Visualization+ and \verb+Color Visualization+ drop-downs allow you to choose specific types of both visualizations. You can disable either of them by choosing \verb+No+ and \verb+None+ respectively, but it is also possible to combine them together.
 
 \begin{figure}[h]
 	\centering
@@ -371,7 +371,7 @@ Basic configuration of a visualization can be done in the main window of MeshDif
 	\label{fig:meshdiff-creating_visualization}
 \end{figure}
 
-Once the visualization types have been chosen, optional clustering can be added to the visualization process to display more general information. Clustering can be configured independently for both arrow visualization and color visualization. The required clustering type can be set via \verb+Clustering for Arrows+ and \verb+Clustering for Colors+ dropdowns and once a non-empty type is chosen, the corresponding trackbar will become active. The values of the trackbars determine the number of clusters which will be displayed for a given visualization type.
+Once the visualization types have been chosen, optional clustering can be added to the visualization process to display more general information. Clustering can be configured independently for both arrow visualization and color visualization. The required clustering type can be set via \verb+Clustering for Arrows+ and \verb+Clustering for Colors+ drop-downs and once a non-empty type is chosen, the corresponding trackbar will become active. The values of the trackbars determine the number of clusters which will be displayed for a given visualization type.
 
 Please note that when selecting the \verb+Signed+ clustering, certain cluster counts do not cover the whole triangle mesh and leave black spots or show no arrows where no clusters have been chosen.
 
@@ -419,7 +419,7 @@ Visualization parameters, such as colors, arrow size and others can be configure
 	\qquad
 	\begin{subfigure}{0.3\textwidth}
 		\includegraphics[width=\textwidth]{./img/meshdiff-visualizer_parameters-thresholding.PNG}
-		\caption{Thresholdng settings}
+		\caption{Thresholding settings}
 		\label{fig:meshdiff-visualizer_parameters_thresholding}
 	\end{subfigure}
 	\caption[MeshDiff - Visualizer parameters - Colors \& thresholding]{MeshDiff - Visualizer parameters configuration window - Colors \& thresholding}
@@ -486,7 +486,7 @@ Click \verb+File > Load Parameters+ and choose the desired \verb+.ini+ file. In 
 \section{User Study Results}
 \label{attch:complete_study_results}
 
-In this attachment, the complete results of the user study are enclosed. Each page covers one question and includes the question itself, screenshots of all four associated visualizations and a table with the distribution of answers and normalized average answer times for each visualization. We will now explain how we computed the normalized average answer times.
+In this attachment, the complete results of the user study are enclosed. Each~page covers one question and includes the question itself, screenshots of all four associated visualizations and a table with the distribution of answers and normalized average answer times for each visualization. We will now explain how we computed the normalized average answer times.
 
 Each participant has a different overall speed of answering. Consider participants \(p_i \text{ where } i = 1, 2, \dotsc, n\), questions \(q_j \text{ where } j = 1, 2, \dotsc, m\) and the answer times for each participant and question \(t(p_i,q_j)\). In order to eliminate these differences, we compute the average answer times \(\overline{t}(p_i,q)\) for each participant separately and created a normalization coefficient \(c_i\) where
 
