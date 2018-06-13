@@ -10,7 +10,7 @@ Visualization of the difference between two triangle meshes is useful in geometr
 
 ## Full Text
 
-You can find the full text of the thesis in PDF under *Releases*.
+You can find the full text of the thesis in PDF under [Releases](https://github.com/honzukka/Bachelor-Thesis/releases).
 
 ## MeshDiff
 
